@@ -68,14 +68,24 @@
   .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
   .cal-day-name { font-weight: bold; color: var(--teal); margin-bottom: 0.5rem; }
   .cal-day { 
-    aspect-ratio: 1; background: #f0f4f8; border-radius: 12px; display: flex; 
-    align-items: center; justify-content: center; cursor: pointer; position: relative;
-    font-size: 1.1rem; transition: 0.2s; border: 2px solid transparent;
+    aspect-ratio: 1; background: #f0f4f8; border-radius: 12px; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start; cursor: pointer; position: relative;
+    font-size: 1.1rem; transition: 0.2s; border: 2px solid transparent; padding: 4px;
   }
   .cal-day:hover { background: #e1e8ed; }
   .cal-day.active { border-color: var(--accent); background: #fff0eb; }
-  .cal-day.has-data::after { content:''; position:absolute; bottom:6px; width:6px; height:6px; background:var(--teal); border-radius:50%; }
   .cal-day.perfect { background: #c0e8d5; color: #005c4b; }
+  
+  /* Mini Grid for Habit Emojis */
+  .day-habits {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-top: 4px;
+      width: 100%;
+      justify-items: center;
+  }
+  .day-habit-icon { font-size: 0.8rem; line-height: 1; }
   
   .habit-panel { 
     display: none; background: var(--card); padding: 1.5rem; border-radius: 16px; margin-top: 1rem; 
@@ -142,6 +152,12 @@
     { id: 'bank', label: 'Bank Login', icon: '🏦' },
     { id: 'calendar', label: 'Calendar Check', icon: '📅' }
   ];
+  
+  // Helper to get emoji for a habit ID
+  const getHabitIcon = (id) => {
+      const h = HABITS.find(x => x.id === id);
+      return h ? h.icon : '';
+  };
 
   // Load tasks
   fetch('tasks.json')
@@ -195,12 +211,28 @@
       const dayStr = `2025-12-${i.toString().padStart(2, '0')}`;
       const div = document.createElement('div');
       div.className = 'cal-day';
-      div.innerText = i;
       
       const habitsDone = state.calendar[dayStr] || [];
-      if (habitsDone.length > 0) div.classList.add('has-data');
       if (habitsDone.length === HABITS.length) div.classList.add('perfect');
       if (selectedDate === dayStr) div.classList.add('active');
+
+      // Create the day number
+      const numSpan = document.createElement('span');
+      numSpan.innerText = i;
+      div.appendChild(numSpan);
+
+      // Create the mini habit grid
+      const habitContainer = document.createElement('div');
+      habitContainer.className = 'day-habits';
+      
+      habitsDone.forEach(hid => {
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'day-habit-icon';
+          iconSpan.innerText = getHabitIcon(hid);
+          habitContainer.appendChild(iconSpan);
+      });
+      
+      div.appendChild(habitContainer);
 
       div.onclick = () => selectDate(dayStr);
       grid.appendChild(div);
