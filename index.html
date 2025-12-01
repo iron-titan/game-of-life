@@ -48,113 +48,142 @@
   .task.done { opacity:0.6; text-decoration:line-through; background:#c0e8d5; }
   .task.repeatable.done { opacity:1; filter:brightness(0.95); }
   .side-quests { margin-top:4rem; opacity:0.8; }
-  .side-quests h2 { color:white; text-align:center; }
-  .count { font-size:0.9rem; color:#666; }
-</style>
-</head>
-<body>
-<header>
-  <h1>Oksana's Game of Life</h1>
-  <div class="subtitle">Level 1 — December 2025 “Unfuck Yourself”</div>
-</header>
-
-<div class="container">
-  <div class="xp-bar"><div class="xp-fill" id="xpFill">0 / 48 720 xp</div></div>
-
-  <div class="boss-grid">
-    <div class="boss"><h2>PMP Exam</h2><div class="progress" id="pmpScore">0p</div><div class="tasks" id="pmpTasks"></div></div>
-    <div class="boss money"><h2>Money & Freedom</h2><div class="progress" id="moneyScore">0p</div><div class="tasks" id="moneyTasks"></div></div>
-    <div class="boss port"><h2>Bayesboard / Portfolio</h2><div class="progress" id="portScore">0p</div><div class="tasks" id="portTasks"></div></div>
+    .side-quests h2 { color:white; text-align:center; }
+    .count { font-size:0.9rem; color:#666; }
+    
+    /* New styles for counter controls */
+    .counter-controls { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.5); padding:4px 8px; border-radius:20px; }
+    .btn-count {
+      background: var(--accent); color:white; border:none; border-radius:50%;
+      width:28px; height:28px; font-size:1.2rem; line-height:1; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; transition:0.2s;
+    }
+    .btn-count:hover { transform:scale(1.1); filter:brightness(1.1); }
+    .btn-count:active { transform:scale(0.9); }
+    .count-display { font-weight:bold; font-size:1.1rem; min-width:24px; text-align:center; color:var(--text); }
+  </style>
+  </head>
+  <body>
+  <header>
+    <h1>Oksana's Game of Life</h1>
+    <div class="subtitle">Level 1 — December 2025 “Unfuck Yourself”</div>
+  </header>
+  
+  <div class="container">
+    <div class="xp-bar"><div class="xp-fill" id="xpFill">0 / 48 720 xp</div></div>
+  
+    <div class="boss-grid">
+      <div class="boss"><h2>PMP Exam</h2><div class="progress" id="pmpScore">0p</div><div class="tasks" id="pmpTasks"></div></div>
+      <div class="boss money"><h2>Money & Freedom</h2><div class="progress" id="moneyScore">0p</div><div class="tasks" id="moneyTasks"></div></div>
+      <div class="boss port"><h2>Bayesboard / Portfolio</h2><div class="progress" id="portScore">0p</div><div class="tasks" id="portTasks"></div></div>
+    </div>
+  
+    <div class="side-quests">
+      <h2>Side quests (don’t get lost here)</h2>
+      <div class="tasks" id="sideTasks"></div>
+    </div>
   </div>
-
-  <div class="side-quests">
-    <h2>Side quests (don’t get lost here)</h2>
-    <div class="tasks" id="sideTasks"></div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-<script type="module">
-  let tasks = [];
-  let state = JSON.parse(localStorage.getItem("oksanaLifeState") || "{}");
-
-  // Load tasks
-  fetch('tasks.json')
-    .then(r => r.json())
-    .then(data => {
-      tasks = data;
-      render();
-    });
-
-  window.toggle = function(id, repeatable = false) {
-    if (repeatable) {
-      state[id] = (state[id] || 0) + 1;
-      confetti({particleCount: 120, spread: 100, origin: {y: 0.6}});
-    } else {
+  
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script type="module">
+    let tasks = [];
+    let state = JSON.parse(localStorage.getItem("oksanaLifeState") || "{}");
+  
+    // Load tasks
+    fetch('tasks.json')
+      .then(r => r.json())
+      .then(data => {
+        tasks = data;
+        render();
+      });
+  
+    window.toggle = function(id) {
       state[id] = !state[id];
       if (state[id]) confetti({particleCount: 80, spread: 70});
+      save();
     }
-    save();
-  }
-
-  function save() {
-    localStorage.setItem("oksanaLifeState", JSON.stringify(state));
-    render();
-  }
-
-  function render() {
-    let total = 0, pmp=0, money=0, port=0;
-
-    // Clear existing
-    document.getElementById('pmpTasks').innerHTML = '';
-    document.getElementById('moneyTasks').innerHTML = '';
-    document.getElementById('portTasks').innerHTML = '';
-    document.getElementById('sideTasks').innerHTML = '';
-
-    tasks.forEach(t => {
-      const earned = (t.type==="repeatable" ? (state[t.id]||0) * t.p : (state[t.id]?t.p:0));
-      if (earned > 0) {
-        total += earned;
-        if (t.cat==="pmp") pmp += earned;
-        if (t.cat==="money") money += earned;
-        if (t.cat==="port") port += earned;
+  
+    window.changeCount = function(id, delta) {
+      const current = state[id] || 0;
+      const next = Math.max(0, current + delta);
+      if (next > current) {
+           confetti({particleCount: 60, spread: 50, origin: {y: 0.6}});
       }
-
-      const div = document.createElement('div');
-      div.className = `task ${state[t.id] ? 'done' : ''} ${t.type==='repeatable' && state[t.id] ? '' : ''}`;
-      
-      const isChecked = state[t.id] && t.type!=='repeatable' ? 'checked' : '';
-      const repeatStyle = t.type==='repeatable' ? 'style="accent-color:#fe9e84"' : '';
-      
-      div.innerHTML = `
-        <span>${t.text} <b>+${t.p}p</b>${t.type==='repeatable' ? ` <span class="count">(×${state[t.id]||0})</span>` : ''}</span>
-        <input type="checkbox" ${isChecked} ${repeatStyle} onchange="toggle('${t.id}', ${t.type==='repeatable'})">
-      `;
-      
-      // Make the whole div clickable for better UX, but prevent double toggling if clicking the checkbox directly
-      div.onclick = (e) => {
-        if (e.target.type !== 'checkbox') {
-             // find checkbox and toggle it
-             const cb = div.querySelector('input[type="checkbox"]');
-             cb.click();
+      state[id] = next;
+      save();
+    }
+  
+    function save() {
+      localStorage.setItem("oksanaLifeState", JSON.stringify(state));
+      render();
+    }
+  
+    function render() {
+      let total = 0, pmp=0, money=0, port=0;
+  
+      // Clear existing
+      document.getElementById('pmpTasks').innerHTML = '';
+      document.getElementById('moneyTasks').innerHTML = '';
+      document.getElementById('portTasks').innerHTML = '';
+      document.getElementById('sideTasks').innerHTML = '';
+  
+      tasks.forEach(t => {
+        const isRepeatable = t.type === "repeatable";
+        const earned = (isRepeatable ? (state[t.id]||0) * t.p : (state[t.id]?t.p:0));
+        
+        if (earned > 0) {
+          total += earned;
+          if (t.cat==="pmp") pmp += earned;
+          if (t.cat==="money") money += earned;
+          if (t.cat==="port") port += earned;
         }
-      };
-
-      if (t.cat==="pmp") document.getElementById('pmpTasks').appendChild(div);
-      else if (t.cat==="money") document.getElementById('moneyTasks').appendChild(div);
-      else if (t.cat==="port") document.getElementById('portTasks').appendChild(div);
-      else document.getElementById('sideTasks').appendChild(div);
-    });
-
-    const percent = Math.min(100, Math.round(total / 48720 * 100));
-    const fill = document.getElementById('xpFill');
-    fill.style.width = percent + "%";
-    fill.textContent = `${total.toLocaleString()} / 48 720 xp · ${percent}%`;
-
-    document.getElementById('pmpScore').textContent = pmp.toLocaleString() + "p";
-    document.getElementById('moneyScore').textContent = money.toLocaleString() + "p";
-    document.getElementById('portScore').textContent = port.toLocaleString() + "p";
-  }
-</script>
-</body>
-</html>
+  
+        const div = document.createElement('div');
+        // 'done' style logic: standard tasks fade when done; repeatable tasks stay bright but show count
+        div.className = `task ${state[t.id] ? 'done' : ''} ${isRepeatable ? 'repeatable' : ''}`;
+  
+        if (isRepeatable) {
+          const count = state[t.id] || 0;
+          div.innerHTML = `
+            <span>${t.text} <b>+${t.p}p</b></span>
+            <div class="counter-controls" onclick="event.stopPropagation()">
+               <button class="btn-count" onclick="changeCount('${t.id}', -1)">−</button>
+               <span class="count-display">${count}</span>
+               <button class="btn-count" onclick="changeCount('${t.id}', 1)">+</button>
+            </div>
+          `;
+          // No click handler for the whole div needed for repeatable items
+        } else {
+          const isChecked = state[t.id] ? 'checked' : '';
+          div.innerHTML = `
+            <span>${t.text} <b>+${t.p}p</b></span>
+            <input type="checkbox" ${isChecked} onchange="toggle('${t.id}')">
+          `;
+          
+          // Click anywhere to toggle for standard tasks
+          div.onclick = (e) => {
+            if (e.target.type !== 'checkbox') {
+                 const cb = div.querySelector('input[type="checkbox"]');
+                 if (cb) cb.click();
+            }
+          };
+        }
+  
+        if (t.cat==="pmp") document.getElementById('pmpTasks').appendChild(div);
+        else if (t.cat==="money") document.getElementById('moneyTasks').appendChild(div);
+        else if (t.cat==="port") document.getElementById('portTasks').appendChild(div);
+        else document.getElementById('sideTasks').appendChild(div);
+      });
+  
+      const percent = Math.min(100, Math.round(total / 48720 * 100));
+      const fill = document.getElementById('xpFill');
+      fill.style.width = percent + "%";
+      fill.textContent = `${total.toLocaleString()} / 48 720 xp · ${percent}%`;
+  
+      document.getElementById('pmpScore').textContent = pmp.toLocaleString() + "p";
+      document.getElementById('moneyScore').textContent = money.toLocaleString() + "p";
+      document.getElementById('portScore').textContent = port.toLocaleString() + "p";
+    }
+  </script>
+  </body>
+  </html>

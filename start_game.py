@@ -3,6 +3,7 @@ import socketserver
 import webbrowser
 import os
 import sys
+import socket
 
 # Configuration
 PORT = 8080
@@ -30,7 +31,6 @@ def main():
     
     try:
         # Find a free port if 8080 is taken
-        import socket
         port = find_free_port(PORT)
         
         url = f"http://localhost:{port}"
