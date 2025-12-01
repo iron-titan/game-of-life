@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Oksana's Game of Life — Level 1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  @font-face {
+    font-family: 'Berling Sans FB Demi';
+    src: url('assets/berling-sans-demi.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+  }
+  :root {
+    --bg: #0d0e1e;
+    --card: #f7e7be;
+    --accent: #fe9e84;
+    --teal: #009f92;
+    --dark: #00777b;
+    --text: #2d1b1b;
+  }
+  body { 
+    margin:0; padding:0; background:var(--bg); color:var(--text); 
+    font-family:'Berling Sans FB Demi', system-ui, sans-serif; 
+    min-height:100vh;
+  }
+  header { background:var(--teal); padding:1rem; text-align:center; color:white; }
+  h1 { margin:0; font-size:2.2rem; }
+  .subtitle { font-size:1rem; opacity:0.9; }
+  .container { max-width:920px; margin:2rem auto; padding:0 1rem; }
+  
+  .xp-bar { height:50px; background:#00777b33; border-radius:20px; overflow:hidden; margin:2rem 0; position:relative; }
+  .xp-fill { height:100%; width:0%; background:linear-gradient(90deg, #fe9e84, #ff6b6b); transition:width 1s ease; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; font-weight:bold; }
+  .boss-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:1.5rem; margin:3rem 0; }
+  .boss { background:white; border-radius:24px; padding:1.5rem; box-shadow:0 10px 30px rgba(0,0,0,0.1); border:4px solid var(--accent); position:relative; }
+  .boss.money { border-color:#ffbb00; }
+  .boss.port { border-color:#a0e7e5; }
+  .boss h2 { margin:0 0 1rem 0; font-size:1.5rem; color:var(--dark); }
+  .progress { font-size:2.8rem; font-weight:bold; color:var(--accent); text-align:center; margin:0.5rem 0; }
+  .tasks { display:flex; flex-direction:column; gap:0.6rem; margin-top:1rem; }
+  .task { 
+    background:var(--card); padding:0.9rem 1rem; border-radius:16px; 
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer; 
+    transition:0.3s; font-size:1.05rem;
+  }
+  
+  .task:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.1); }
+  .task.done { opacity:0.6; text-decoration:line-through; background:#c0e8d5; }
+  .task.repeatable.done { opacity:1; filter:brightness(0.95); }
+  .side-quests { margin-top:4rem; opacity:0.8; }
+  .side-quests h2 { color:white; text-align:center; }
+  .count { font-size:0.9rem; color:#666; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Oksana's Game of Life</h1>
+  <div class="subtitle">Level 1 — December 2025 “Unfuck Yourself”</div>
+</header>
+
+<div class="container">
+  <div class="xp-bar"><div class="xp-fill" id="xpFill">0 / 48 720 xp</div></div>
+
+  <div class="boss-grid">
+    <div class="boss"><h2>PMP Exam</h2><div class="progress" id="pmpScore">0p</div><div class="tasks" id="pmpTasks"></div></div>
+    <div class="boss money"><h2>Money & Freedom</h2><div class="progress" id="moneyScore">0p</div><div class="tasks" id="moneyTasks"></div></div>
+    <div class="boss port"><h2>Bayesboard / Portfolio</h2><div class="progress" id="portScore">0p</div><div class="tasks" id="portTasks"></div></div>
+  </div>
+
+  <div class="side-quests">
+    <h2>Side quests (don’t get lost here)</h2>
+    <div class="tasks" id="sideTasks"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script type="module">
+  let tasks = [];
+  let state = JSON.parse(localStorage.getItem("oksanaLifeState") || "{}");
+
+  // Load tasks
+  fetch('tasks.json')
+    .then(r => r.json())
+    .then(data => {
+      tasks = data;
+      render();
+    });
+
+  window.toggle = function(id, repeatable = false) {
+    if (repeatable) {
+      state[id] = (state[id] || 0) + 1;
+      confetti({particleCount: 120, spread: 100, origin: {y: 0.6}});
+    } else {
+      state[id] = !state[id];
+      if (state[id]) confetti({particleCount: 80, spread: 70});
+    }
+    save();
+  }
+
+  function save() {
+    localStorage.setItem("oksanaLifeState", JSON.stringify(state));
+    render();
+  }
+
+  function render() {
+    let total = 0, pmp=0, money=0, port=0;
+
+    // Clear existing
+    document.getElementById('pmpTasks').innerHTML = '';
+    document.getElementById('moneyTasks').innerHTML = '';
+    document.getElementById('portTasks').innerHTML = '';
+    document.getElementById('sideTasks').innerHTML = '';
+
+    tasks.forEach(t => {
+      const earned = (t.type==="repeatable" ? (state[t.id]||0) * t.p : (state[t.id]?t.p:0));
+      if (earned > 0) {
+        total += earned;
+        if (t.cat==="pmp") pmp += earned;
+        if (t.cat==="money") money += earned;
+        if (t.cat==="port") port += earned;
+      }
+
+      const div = document.createElement('div');
+      div.className = `task ${state[t.id] ? 'done' : ''} ${t.type==='repeatable' && state[t.id] ? '' : ''}`;
+      
+      const isChecked = state[t.id] && t.type!=='repeatable' ? 'checked' : '';
+      const repeatStyle = t.type==='repeatable' ? 'style="accent-color:#fe9e84"' : '';
+      
+      div.innerHTML = `
+        <span>${t.text} <b>+${t.p}p</b>${t.type==='repeatable' ? ` <span class="count">(×${state[t.id]||0})</span>` : ''}</span>
+        <input type="checkbox" ${isChecked} ${repeatStyle} onchange="toggle('${t.id}', ${t.type==='repeatable'})">
+      `;
+      
+      // Make the whole div clickable for better UX, but prevent double toggling if clicking the checkbox directly
+      div.onclick = (e) => {
+        if (e.target.type !== 'checkbox') {
+             // find checkbox and toggle it
+             const cb = div.querySelector('input[type="checkbox"]');
+             cb.click();
+        }
+      };
+
+      if (t.cat==="pmp") document.getElementById('pmpTasks').appendChild(div);
+      else if (t.cat==="money") document.getElementById('moneyTasks').appendChild(div);
+      else if (t.cat==="port") document.getElementById('portTasks').appendChild(div);
+      else document.getElementById('sideTasks').appendChild(div);
+    });
+
+    const percent = Math.min(100, Math.round(total / 48720 * 100));
+    const fill = document.getElementById('xpFill');
+    fill.style.width = percent + "%";
+    fill.textContent = `${total.toLocaleString()} / 48 720 xp · ${percent}%`;
+
+    document.getElementById('pmpScore').textContent = pmp.toLocaleString() + "p";
+    document.getElementById('moneyScore').textContent = money.toLocaleString() + "p";
+    document.getElementById('portScore').textContent = port.toLocaleString() + "p";
+  }
+</script>
+</body>
+</html>
