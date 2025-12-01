@@ -48,77 +48,216 @@
   .task.done { opacity:0.6; text-decoration:line-through; background:#c0e8d5; }
   .task.repeatable.done { opacity:1; filter:brightness(0.95); }
   .side-quests { margin-top:4rem; opacity:0.8; }
-    .side-quests h2 { color:white; text-align:center; }
-    .count { font-size:0.9rem; color:#666; }
-    
-    /* New styles for counter controls */
-    .counter-controls { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.5); padding:4px 8px; border-radius:20px; }
-    .btn-count {
-      background: var(--accent); color:white; border:none; border-radius:50%;
-      width:28px; height:28px; font-size:1.2rem; line-height:1; cursor:pointer;
-      display:flex; align-items:center; justify-content:center; transition:0.2s;
-    }
-    .btn-count:hover { transform:scale(1.1); filter:brightness(1.1); }
-    .btn-count:active { transform:scale(0.9); }
-    .count-display { font-weight:bold; font-size:1.1rem; min-width:24px; text-align:center; color:var(--text); }
-  </style>
-  </head>
-  <body>
-  <header>
-    <h1>Oksana's Game of Life</h1>
-    <div class="subtitle">Level 1 — December 2025 “Unfuck Yourself”</div>
-  </header>
+  .side-quests h2 { color:white; text-align:center; }
+  .count { font-size:0.9rem; color:#666; }
   
-  <div class="container">
-    <div class="xp-bar"><div class="xp-fill" id="xpFill">0 / 48 720 xp</div></div>
+  /* New styles for counter controls */
+  .counter-controls { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.5); padding:4px 8px; border-radius:20px; }
+  .btn-count {
+    background: var(--accent); color:white; border:none; border-radius:50%;
+    width:28px; height:28px; font-size:1.2rem; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; transition:0.2s;
+  }
+  .btn-count:hover { transform:scale(1.1); filter:brightness(1.1); }
+  .btn-count:active { transform:scale(0.9); }
+  .count-display { font-weight:bold; font-size:1.1rem; min-width:24px; text-align:center; color:var(--text); }
+
+  /* Calendar Styles */
+  .calendar-section { margin: 2rem 0; background: white; border-radius: 24px; padding: 1.5rem; border: 4px solid var(--teal); }
+  .calendar-header { text-align: center; font-size: 1.5rem; color: var(--dark); margin-bottom: 1rem; font-weight: bold; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
+  .cal-day-name { font-weight: bold; color: var(--teal); margin-bottom: 0.5rem; }
+  .cal-day { 
+    aspect-ratio: 1; background: #f0f4f8; border-radius: 12px; display: flex; 
+    align-items: center; justify-content: center; cursor: pointer; position: relative;
+    font-size: 1.1rem; transition: 0.2s; border: 2px solid transparent;
+  }
+  .cal-day:hover { background: #e1e8ed; }
+  .cal-day.active { border-color: var(--accent); background: #fff0eb; }
+  .cal-day.has-data::after { content:''; position:absolute; bottom:6px; width:6px; height:6px; background:var(--teal); border-radius:50%; }
+  .cal-day.perfect { background: #c0e8d5; color: #005c4b; }
   
-    <div class="boss-grid">
-      <div class="boss"><h2>PMP Exam</h2><div class="progress" id="pmpScore">0p</div><div class="tasks" id="pmpTasks"></div></div>
-      <div class="boss money"><h2>Money & Freedom</h2><div class="progress" id="moneyScore">0p</div><div class="tasks" id="moneyTasks"></div></div>
-      <div class="boss port"><h2>Bayesboard / Portfolio</h2><div class="progress" id="portScore">0p</div><div class="tasks" id="portTasks"></div></div>
+  .habit-panel { 
+    display: none; background: var(--card); padding: 1.5rem; border-radius: 16px; margin-top: 1rem; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); animation: slideDown 0.3s ease;
+  }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+  .habit-date-title { font-size: 1.3rem; margin-bottom: 1rem; text-align: center; color: var(--text); }
+  .habit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .habit-btn {
+    background: rgba(255,255,255,0.6); border: 2px solid transparent; padding: 10px; border-radius: 12px;
+    cursor: pointer; text-align: center; font-size: 0.95rem; transition: 0.2s; display: flex; flex-direction: column; gap: 5px; align-items: center;
+  }
+  .habit-btn:hover { background: rgba(255,255,255,0.9); transform: translateY(-2px); }
+  .habit-btn.done { background: var(--teal); color: white; border-color: var(--dark); }
+  .habit-icon { font-size: 1.5rem; }
+
+</style>
+</head>
+<body>
+<header>
+  <h1>Oksana's Game of Life</h1>
+  <div class="subtitle">Level 1 — December 2025 “Unfuck Yourself”</div>
+</header>
+
+<div class="container">
+  <div class="xp-bar"><div class="xp-fill" id="xpFill">0 / 48 720 xp</div></div>
+
+  <!-- Calendar Section -->
+  <div class="calendar-section">
+    <div class="calendar-header">December 2025</div>
+    <div class="calendar-grid" id="calendarGrid">
+      <!-- Days injected by JS -->
     </div>
-  
-    <div class="side-quests">
-      <h2>Side quests (don’t get lost here)</h2>
-      <div class="tasks" id="sideTasks"></div>
+    
+    <div class="habit-panel" id="habitPanel">
+      <div class="habit-date-title" id="habitDateTitle"></div>
+      <div class="habit-grid" id="habitGrid"></div>
     </div>
   </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-  <script type="module">
-    let tasks = [];
-    let state = JSON.parse(localStorage.getItem("oksanaLifeState") || "{}");
-  
-    // Load tasks
-    fetch('tasks.json')
-      .then(r => r.json())
-      .then(data => {
-        tasks = data;
-        render();
-      });
-  
-    window.toggle = function(id) {
+
+  <div class="boss-grid">
+    <div class="boss"><h2>PMP Exam</h2><div class="progress" id="pmpScore">0p</div><div class="tasks" id="pmpTasks"></div></div>
+    <div class="boss money"><h2>Money & Freedom</h2><div class="progress" id="moneyScore">0p</div><div class="tasks" id="moneyTasks"></div></div>
+    <div class="boss port"><h2>Bayesboard / Portfolio</h2><div class="progress" id="portScore">0p</div><div class="tasks" id="portTasks"></div></div>
+  </div>
+
+  <div class="side-quests">
+    <h2>Side quests (don’t get lost here)</h2>
+    <div class="tasks" id="sideTasks"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script type="module">
+  let tasks = [];
+  let state = JSON.parse(localStorage.getItem("oksanaLifeState") || "{}");
+  if (!state.calendar) state.calendar = {}; // { "2025-12-01": ["pmp", "gym"] }
+
+  const HABITS = [
+    { id: 'pmp', label: 'PMP Study (2h)', icon: '📚' },
+    { id: 'gym', label: 'Gym / Workout', icon: '💪' },
+    { id: 'sleep', label: 'Sleep Schedule', icon: '😴' },
+    { id: 'supplements', label: 'Supplements', icon: '💊' },
+    { id: 'bank', label: 'Bank Login', icon: '🏦' },
+    { id: 'calendar', label: 'Calendar Check', icon: '📅' }
+  ];
+
+  // Load tasks
+  fetch('tasks.json')
+    .then(r => r.json())
+    .then(data => {
+      tasks = data;
+      render();
+      renderCalendar();
+    });
+
+  window.toggle = function(id, repeatable = false) {
+    if (repeatable) {
+      state[id] = (state[id] || 0) + 1;
+      confetti({particleCount: 120, spread: 100, origin: {y: 0.6}});
+    } else {
       state[id] = !state[id];
       if (state[id]) confetti({particleCount: 80, spread: 70});
-      save();
     }
-  
-    window.changeCount = function(id, delta) {
-      const current = state[id] || 0;
-      const next = Math.max(0, current + delta);
-      if (next > current) {
-           confetti({particleCount: 60, spread: 50, origin: {y: 0.6}});
-      }
-      state[id] = next;
-      save();
+    save();
+  }
+
+  window.changeCount = function(id, delta) {
+    const current = state[id] || 0;
+    const next = Math.max(0, current + delta);
+    if (next > current) {
+         confetti({particleCount: 60, spread: 50, origin: {y: 0.6}});
     }
+    state[id] = next;
+    save();
+  }
+
+  // Calendar Logic
+  let selectedDate = null;
   
-    function save() {
-      localStorage.setItem("oksanaLifeState", JSON.stringify(state));
-      render();
+  function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+    
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'cal-day-name';
+      div.innerText = d;
+      grid.appendChild(div);
+    });
+
+    // Dec 2025 starts on Monday (1st). 31 days.
+    // Empty Sunday slot
+    grid.appendChild(document.createElement('div')); 
+
+    for (let i = 1; i <= 31; i++) {
+      const dayStr = `2025-12-${i.toString().padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = 'cal-day';
+      div.innerText = i;
+      
+      const habitsDone = state.calendar[dayStr] || [];
+      if (habitsDone.length > 0) div.classList.add('has-data');
+      if (habitsDone.length === HABITS.length) div.classList.add('perfect');
+      if (selectedDate === dayStr) div.classList.add('active');
+
+      div.onclick = () => selectDate(dayStr);
+      grid.appendChild(div);
     }
-  
-    function render() {
+  }
+
+  function selectDate(date) {
+    selectedDate = date === selectedDate ? null : date;
+    renderCalendar();
+    renderHabitPanel();
+  }
+
+  function renderHabitPanel() {
+    const panel = document.getElementById('habitPanel');
+    const grid = document.getElementById('habitGrid');
+    const title = document.getElementById('habitDateTitle');
+    
+    if (!selectedDate) {
+      panel.style.display = 'none';
+      return;
+    }
+
+    panel.style.display = 'block';
+    title.innerText = `Habits for Dec ${selectedDate.split('-')[2]}`;
+    grid.innerHTML = '';
+
+    const doneToday = state.calendar[selectedDate] || [];
+
+    HABITS.forEach(h => {
+      const isDone = doneToday.includes(h.id);
+      const btn = document.createElement('div');
+      btn.className = `habit-btn ${isDone ? 'done' : ''}`;
+      btn.innerHTML = `<div class="habit-icon">${h.icon}</div><div>${h.label}</div>`;
+      
+      btn.onclick = () => {
+        const current = state.calendar[selectedDate] || [];
+        if (current.includes(h.id)) {
+          state.calendar[selectedDate] = current.filter(x => x !== h.id);
+        } else {
+          state.calendar[selectedDate] = [...current, h.id];
+          confetti({particleCount: 40, spread: 40, origin: {y: 0.7}});
+        }
+        save(); // Save & Re-render everything
+      };
+      
+      grid.appendChild(btn);
+    });
+  }
+
+  function save() {
+    localStorage.setItem("oksanaLifeState", JSON.stringify(state));
+    render();
+    renderCalendar();
+    renderHabitPanel();
+  }
+
+  function render() {
       let total = 0, pmp=0, money=0, port=0;
   
       // Clear existing
