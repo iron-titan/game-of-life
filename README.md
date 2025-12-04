@@ -1,4 +1,4 @@
-# Oksana's Game of Life – Level 1: "Unfuck Yourself"
+# Game of Life – Level 1: "Unfuck Yourself"
 
 A personal gamified productivity dashboard for December 2025.
 
