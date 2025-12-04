@@ -5,12 +5,6 @@
 <title>Oksana's Game of Life — Level 1</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  @font-face {
-    font-family: 'Berling Sans FB Demi';
-    src: url('assets/berling-sans-demi.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-  }
   :root {
     --bg: #0d0e1e;
     --card: #f7e7be;
@@ -19,38 +13,39 @@
     --dark: #00777b;
     --text: #2d1b1b;
   }
-  body { 
-    margin:0; padding:0; background:var(--bg); color:var(--text); 
-    font-family:'Berling Sans FB Demi', system-ui, sans-serif; 
+  body {
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
     min-height:100vh;
   }
   header { background:var(--teal); padding:1rem; text-align:center; color:white; }
   h1 { margin:0; font-size:2.2rem; }
   .subtitle { font-size:1rem; opacity:0.9; }
   .container { max-width:920px; margin:2rem auto; padding:0 1rem; }
-  
+
   .xp-bar { height:50px; background:#00777b33; border-radius:20px; overflow:hidden; margin:2rem 0; position:relative; }
   .xp-fill { height:100%; width:0%; background:linear-gradient(90deg, #fe9e84, #ff6b6b); transition:width 1s ease; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; font-weight:bold; }
   .boss-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:1.5rem; margin:3rem 0; }
   .boss { background:white; border-radius:24px; padding:1.5rem; box-shadow:0 10px 30px rgba(0,0,0,0.1); border:4px solid var(--accent); position:relative; }
   .boss.money { border-color:#ffbb00; }
   .boss.port { border-color:#a0e7e5; }
-  .boss h2 { margin:0 0 1rem 0; font-size:1.5rem; color:var(--dark); }
+  .boss h2 { margin:0 0 1rem 0; font-size:1.5rem; color:var(--dark); display:flex; justify-content:space-between; align-items:center; }
   .progress { font-size:2.8rem; font-weight:bold; color:var(--accent); text-align:center; margin:0.5rem 0; }
   .tasks { display:flex; flex-direction:column; gap:0.6rem; margin-top:1rem; }
-  .task { 
-    background:var(--card); padding:0.9rem 1rem; border-radius:16px; 
-    display:flex; justify-content:space-between; align-items:center; cursor:pointer; 
+  .task {
+    background:var(--card); padding:0.9rem 1rem; border-radius:16px;
+    display:flex; justify-content:space-between; align-items:center; cursor:pointer;
     transition:0.3s; font-size:1.05rem;
+    position: relative; /* Context for absolute controls if needed */
   }
-  
+
   .task:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.1); }
   .task.done { opacity:0.6; text-decoration:line-through; background:#c0e8d5; }
   .task.repeatable.done { opacity:1; filter:brightness(0.95); }
   .side-quests { margin-top:4rem; opacity:0.8; }
-  .side-quests h2 { color:white; text-align:center; }
+  .side-quests h2 { color:white; text-align:center; display:flex; justify-content:center; align-items:center; gap:10px; }
   .count { font-size:0.9rem; color:#666; }
-  
+
   /* New styles for counter controls */
   .counter-controls { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.5); padding:4px 8px; border-radius:20px; }
   .btn-count {
@@ -62,12 +57,26 @@
   .btn-count:active { transform:scale(0.9); }
   .count-display { font-weight:bold; font-size:1.1rem; min-width:24px; text-align:center; color:var(--text); }
 
+  /* Task Controls (Edit/Delete) */
+  .task-controls { 
+      display:flex; gap:8px; margin-left:10px; align-items:center; 
+      z-index: 10; 
+      position: relative;
+  }
+  .control-btn { 
+      background: rgba(255,255,255,0.5); border:1px solid rgba(0,0,0,0.1); border-radius:6px; cursor:pointer; 
+      width: 32px; height: 32px; font-size: 1.1rem; transition:0.2s; display:flex; align-items:center; justify-content:center;
+  }
+  .control-btn:hover { background: rgba(255,255,255,0.8); transform:scale(1.1); }
+  .control-btn.delete { color: #d32f2f; border-color:#ffcdd2; }
+  .control-btn.edit { color: #0277bd; border-color:#b3e5fc; }
+
   /* Calendar Styles */
   .calendar-section { margin: 2rem 0; background: white; border-radius: 24px; padding: 1.5rem; border: 4px solid var(--teal); }
   .calendar-header { text-align: center; font-size: 1.5rem; color: var(--dark); margin-bottom: 1rem; font-weight: bold; }
   .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
   .cal-day-name { font-weight: bold; color: var(--teal); margin-bottom: 0.5rem; }
-  .cal-day { 
+  .cal-day {
     aspect-ratio: 1; background: #f0f4f8; border-radius: 12px; display: flex; flex-direction: column;
     align-items: center; justify-content: flex-start; cursor: pointer; position: relative;
     font-size: 1.1rem; transition: 0.2s; border: 2px solid transparent; padding: 4px;
@@ -75,7 +84,7 @@
   .cal-day:hover { background: #e1e8ed; }
   .cal-day.active { border-color: var(--accent); background: #fff0eb; }
   .cal-day.perfect { background: #c0e8d5; color: #005c4b; }
-  
+
   /* Mini Grid for Habit Emojis */
   .day-habits {
       display: grid;
@@ -86,9 +95,9 @@
       justify-items: center;
   }
   .day-habit-icon { font-size: 0.8rem; line-height: 1; }
-  
-  .habit-panel { 
-    display: none; background: var(--card); padding: 1.5rem; border-radius: 16px; margin-top: 1rem; 
+
+  .habit-panel {
+    display: none; background: var(--card); padding: 1.5rem; border-radius: 16px; margin-top: 1rem;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1); animation: slideDown 0.3s ease;
   }
   @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
@@ -101,6 +110,18 @@
   .habit-btn:hover { background: rgba(255,255,255,0.9); transform: translateY(-2px); }
   .habit-btn.done { background: var(--teal); color: white; border-color: var(--dark); }
   .habit-icon { font-size: 1.5rem; }
+
+  /* Modal */
+  .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
+  .modal { background:white; padding:2rem; border-radius:16px; width:90%; max-width:400px; border:4px solid var(--accent); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+  .modal h3 { margin-top:0; color:var(--dark); }
+  .modal input, .modal select { width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:2px solid #eee; font-family:inherit; box-sizing: border-box; }
+  .modal-btns { display:flex; gap:10px; justify-content:flex-end; }
+  .btn-primary { padding:10px 20px; background:var(--teal); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
+  .btn-secondary { padding:10px 20px; background:#eee; color:var(--text); border:none; border-radius:8px; cursor:pointer; }
+  
+  .add-btn { cursor:pointer; font-size:0.7em; background:var(--accent); color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-left:10px; vertical-align:middle; }
+  .add-btn:hover { transform:scale(1.1); }
 
 </style>
 </head>
@@ -119,7 +140,7 @@
     <div class="calendar-grid" id="calendarGrid">
       <!-- Days injected by JS -->
     </div>
-    
+
     <div class="habit-panel" id="habitPanel">
       <div class="habit-date-title" id="habitDateTitle"></div>
       <div class="habit-grid" id="habitGrid"></div>
@@ -127,22 +148,56 @@
   </div>
 
   <div class="boss-grid">
-    <div class="boss"><h2>PMP Exam</h2><div class="progress" id="pmpScore">0p</div><div class="tasks" id="pmpTasks"></div></div>
-    <div class="boss money"><h2>Money & Freedom</h2><div class="progress" id="moneyScore">0p</div><div class="tasks" id="moneyTasks"></div></div>
-    <div class="boss port"><h2>Bayesboard / Portfolio</h2><div class="progress" id="portScore">0p</div><div class="tasks" id="portTasks"></div></div>
+    <div class="boss">
+        <h2>PMP Exam <span class="add-btn" onclick="openAddTask('pmp')">+</span></h2>
+        <div class="progress" id="pmpScore">0p</div>
+        <div class="tasks" id="pmpTasks"></div>
+    </div>
+    <div class="boss money">
+        <h2>Money & Freedom <span class="add-btn" onclick="openAddTask('money')">+</span></h2>
+        <div class="progress" id="moneyScore">0p</div>
+        <div class="tasks" id="moneyTasks"></div>
+    </div>
+    <div class="boss port">
+        <h2>Bayesboard / Portfolio <span class="add-btn" onclick="openAddTask('port')">+</span></h2>
+        <div class="progress" id="portScore">0p</div>
+        <div class="tasks" id="portTasks"></div>
+    </div>
   </div>
 
   <div class="side-quests">
-    <h2>Side quests (don’t get lost here)</h2>
+    <h2>Side quests <span class="add-btn" onclick="openAddTask('side')">+</span></h2>
     <div class="tasks" id="sideTasks"></div>
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal">
+        <h3 id="modalTitle">Add New Task</h3>
+        <input type="text" id="newTaskText" placeholder="Task description...">
+        <input type="number" id="newTaskPoints" placeholder="Points (XP)">
+        <select id="newTaskType">
+            <option value="once">One-time Task</option>
+            <option value="repeatable">Repeatable Task</option>
+        </select>
+        <input type="hidden" id="newTaskCat">
+        <div class="modal-btns">
+            <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn-primary" onclick="saveTask()">Save Task</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <script type="module">
-  let tasks = [];
+  let baseTasks = []; // From JSON
+  let allTasks = [];  // Merged
   let state = JSON.parse(localStorage.getItem("oksanaLifeState") || "{}");
-  if (!state.calendar) state.calendar = {}; // { "2025-12-01": ["pmp", "gym"] }
+  let editingId = null; // Track if we are editing
+  
+  if (!state.calendar) state.calendar = {}; 
+  if (!state.customTasks) state.customTasks = []; // Array of {id, text, p, cat, type}
 
   const HABITS = [
     { id: 'pmp', label: 'PMP Study (2h)', icon: '📚' },
@@ -152,8 +207,7 @@
     { id: 'bank', label: 'Bank Login', icon: '🏦' },
     { id: 'calendar', label: 'Calendar Check', icon: '📅' }
   ];
-  
-  // Helper to get emoji for a habit ID
+
   const getHabitIcon = (id) => {
       const h = HABITS.find(x => x.id === id);
       return h ? h.icon : '';
@@ -163,10 +217,20 @@
   fetch('tasks.json')
     .then(r => r.json())
     .then(data => {
-      tasks = data;
+      baseTasks = data;
+      mergeTasks();
+      checkAutoCompletions();
       render();
       renderCalendar();
+    })
+    .catch(e => {
+        console.error(e);
+        alert("Error loading tasks.json! Check console.");
     });
+
+  function mergeTasks() {
+      allTasks = [...baseTasks, ...state.customTasks];
+  }
 
   window.toggle = function(id, repeatable = false) {
     if (repeatable) {
@@ -189,13 +253,61 @@
     save();
   }
 
+  // --- STREAK LOGIC ---
+  function calculateStreaks(habitId) {
+      const dates = Object.keys(state.calendar).sort();
+      let currentStreak = 0;
+      let maxStreak = 0;
+      
+      const start = new Date(2025, 11, 1); // Dec 1
+      const end = new Date(2025, 11, 31);
+      
+      let tempStreak = 0;
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const dateStr = d.toISOString().split('T')[0];
+          const done = (state.calendar[dateStr] || []).includes(habitId);
+          
+          if (done) {
+              tempStreak++;
+          } else {
+              tempStreak = 0;
+          }
+          if (tempStreak > maxStreak) maxStreak = tempStreak;
+      }
+      return maxStreak;
+  }
+
+  function checkAutoCompletions() {
+      let changed = false;
+      allTasks.forEach(t => {
+          if (t.streakCondition && !state[t.id]) {
+              const { habitId, count } = t.streakCondition;
+              const streak = calculateStreaks(habitId);
+              if (streak >= count) {
+                  state[t.id] = true;
+                  changed = true;
+                  setTimeout(() => {
+                      confetti({
+                          particleCount: 200,
+                          spread: 100,
+                          origin: { y: 0.6 },
+                          colors: ['#FFD700', '#FFA500']
+                      });
+                      alert(`🔥 STREAK ACHIEVED: ${t.text} (${streak} days!)`);
+                  }, 500);
+              }
+          }
+      });
+      return changed;
+  }
+
   // Calendar Logic
   let selectedDate = null;
-  
+
   function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '';
-    
+
     ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
       const div = document.createElement('div');
       div.className = 'cal-day-name';
@@ -203,35 +315,31 @@
       grid.appendChild(div);
     });
 
-    // Dec 2025 starts on Monday (1st). 31 days.
-    // Empty Sunday slot
-    grid.appendChild(document.createElement('div')); 
+    grid.appendChild(document.createElement('div')); // Empty Sunday
 
     for (let i = 1; i <= 31; i++) {
       const dayStr = `2025-12-${i.toString().padStart(2, '0')}`;
       const div = document.createElement('div');
       div.className = 'cal-day';
-      
+
       const habitsDone = state.calendar[dayStr] || [];
       if (habitsDone.length === HABITS.length) div.classList.add('perfect');
       if (selectedDate === dayStr) div.classList.add('active');
 
-      // Create the day number
       const numSpan = document.createElement('span');
       numSpan.innerText = i;
       div.appendChild(numSpan);
 
-      // Create the mini habit grid
       const habitContainer = document.createElement('div');
       habitContainer.className = 'day-habits';
-      
+
       habitsDone.forEach(hid => {
           const iconSpan = document.createElement('span');
           iconSpan.className = 'day-habit-icon';
           iconSpan.innerText = getHabitIcon(hid);
           habitContainer.appendChild(iconSpan);
       });
-      
+
       div.appendChild(habitContainer);
 
       div.onclick = () => selectDate(dayStr);
@@ -249,7 +357,7 @@
     const panel = document.getElementById('habitPanel');
     const grid = document.getElementById('habitGrid');
     const title = document.getElementById('habitDateTitle');
-    
+
     if (!selectedDate) {
       panel.style.display = 'none';
       return;
@@ -266,7 +374,7 @@
       const btn = document.createElement('div');
       btn.className = `habit-btn ${isDone ? 'done' : ''}`;
       btn.innerHTML = `<div class="habit-icon">${h.icon}</div><div>${h.label}</div>`;
-      
+
       btn.onclick = () => {
         const current = state.calendar[selectedDate] || [];
         if (current.includes(h.id)) {
@@ -275,86 +383,229 @@
           state.calendar[selectedDate] = [...current, h.id];
           confetti({particleCount: 40, spread: 40, origin: {y: 0.7}});
         }
-        save(); // Save & Re-render everything
+        save(); 
       };
-      
+
       grid.appendChild(btn);
     });
   }
 
   function save() {
+    // Check for auto-completions before saving
+    checkAutoCompletions();
     localStorage.setItem("oksanaLifeState", JSON.stringify(state));
     render();
     renderCalendar();
     renderHabitPanel();
   }
 
-  function render() {
+    function render() {
+      console.log("Rendering tasks. Total:", allTasks.length);
+      console.log("Custom tasks count:", state.customTasks.length);
+
       let total = 0, pmp=0, money=0, port=0;
-  
-      // Clear existing
-      document.getElementById('pmpTasks').innerHTML = '';
-      document.getElementById('moneyTasks').innerHTML = '';
-      document.getElementById('portTasks').innerHTML = '';
-      document.getElementById('sideTasks').innerHTML = '';
-  
-      tasks.forEach(t => {
+
+      const containers = {
+          pmp: document.getElementById('pmpTasks'),
+          money: document.getElementById('moneyTasks'),
+          port: document.getElementById('portTasks'),
+          side: document.getElementById('sideTasks')
+      };
+
+      // Clear containers
+      Object.values(containers).forEach(el => el.innerHTML = '');
+
+      allTasks.forEach(t => {
         const isRepeatable = t.type === "repeatable";
         const earned = (isRepeatable ? (state[t.id]||0) * t.p : (state[t.id]?t.p:0));
-        
+
         if (earned > 0) {
           total += earned;
           if (t.cat==="pmp") pmp += earned;
           if (t.cat==="money") money += earned;
           if (t.cat==="port") port += earned;
         }
-  
+
         const div = document.createElement('div');
-        // 'done' style logic: standard tasks fade when done; repeatable tasks stay bright but show count
         div.className = `task ${state[t.id] ? 'done' : ''} ${isRepeatable ? 'repeatable' : ''}`;
-  
+
+        // Task Content Construction
+        // Left Side: Text + Points
+        // Right Side: Action (Checkbox/Counter) + Controls (Edit/Delete)
+        
+        const leftHtml = `<span>${t.text} <b>+${t.p}p</b></span>`;
+        
+        let rightHtml = '';
+        
         if (isRepeatable) {
-          const count = state[t.id] || 0;
-          div.innerHTML = `
-            <span>${t.text} <b>+${t.p}p</b></span>
+            const count = state[t.id] || 0;
+            rightHtml += `
             <div class="counter-controls" onclick="event.stopPropagation()">
-               <button class="btn-count" onclick="changeCount('${t.id}', -1)">−</button>
+               <button class="btn-count" onclick="window.changeCount('${t.id}', -1)">−</button>
                <span class="count-display">${count}</span>
-               <button class="btn-count" onclick="changeCount('${t.id}', 1)">+</button>
+               <button class="btn-count" onclick="window.changeCount('${t.id}', 1)">+</button>
             </div>
-          `;
-          // No click handler for the whole div needed for repeatable items
+            `;
         } else {
-          const isChecked = state[t.id] ? 'checked' : '';
-          div.innerHTML = `
-            <span>${t.text} <b>+${t.p}p</b></span>
-            <input type="checkbox" ${isChecked} onchange="toggle('${t.id}')">
-          `;
-          
-          // Click anywhere to toggle for standard tasks
+            const isChecked = state[t.id] ? 'checked' : '';
+            rightHtml += `
+            <input type="checkbox" ${isChecked} onchange="window.toggle('${t.id}')">
+            `;
+        }
+
+        // Add Edit/Delete controls for custom tasks
+        if (t.id.toString().startsWith('custom_')) {
+            rightHtml += `
+            <div class="task-controls">
+                <button class="control-btn edit" title="Edit">✎</button>
+                <button class="control-btn delete" title="Delete">✕</button>
+            </div>
+            `;
+        }
+        
+        // Wrap right side
+        div.innerHTML = `${leftHtml}<div style="display:flex; align-items:center; gap:10px;">${rightHtml}</div>`;
+
+        // Programmatically attach event listeners for custom controls
+        if (t.id.toString().startsWith('custom_')) {
+            const controlsDiv = div.querySelector('.task-controls');
+            const editBtn = div.querySelector('.control-btn.edit');
+            const deleteBtn = div.querySelector('.control-btn.delete');
+
+            if (controlsDiv) {
+                controlsDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log("Edit clicked for", t.id);
+                    window.openEditTask(t.id);
+                });
+            }
+
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log("Delete clicked for", t.id);
+                    window.deleteTask(t.id);
+                });
+            }
+        }
+
+        if (!isRepeatable) {
           div.onclick = (e) => {
-            if (e.target.type !== 'checkbox') {
+            // Check if click was on controls or checkbox
+            if (e.target.type !== 'checkbox' && !e.target.closest('.task-controls') && !e.target.closest('.counter-controls')) {
                  const cb = div.querySelector('input[type="checkbox"]');
                  if (cb) cb.click();
             }
           };
         }
-  
+
         if (t.cat==="pmp") document.getElementById('pmpTasks').appendChild(div);
         else if (t.cat==="money") document.getElementById('moneyTasks').appendChild(div);
         else if (t.cat==="port") document.getElementById('portTasks').appendChild(div);
         else document.getElementById('sideTasks').appendChild(div);
       });
-  
+
       const percent = Math.min(100, Math.round(total / 48720 * 100));
       const fill = document.getElementById('xpFill');
       fill.style.width = percent + "%";
       fill.textContent = `${total.toLocaleString()} / 48 720 xp · ${percent}%`;
-  
+
       document.getElementById('pmpScore').textContent = pmp.toLocaleString() + "p";
       document.getElementById('moneyScore').textContent = money.toLocaleString() + "p";
       document.getElementById('portScore').textContent = port.toLocaleString() + "p";
     }
+
+    // Modal Logic
+    window.openAddTask = function(cat) {
+        console.log("openAddTask called for cat:", cat);
+        editingId = null;
+        document.getElementById('modalTitle').innerText = 'Add New Task';
+        document.getElementById('newTaskCat').value = cat;
+        document.getElementById('newTaskText').value = '';
+        document.getElementById('newTaskPoints').value = '';
+        document.getElementById('addModal').style.display = 'flex';
+        document.getElementById('newTaskText').focus();
+    }
+
+    window.openEditTask = function(id) {
+        console.log("openEditTask called for id:", id);
+        const task = state.customTasks.find(t => t.id === id);
+        if (!task) {
+            console.error("Task not found for editing:", id);
+            alert("Error: Task not found in custom tasks list.");
+            return;
+        }
+        
+        editingId = id;
+        document.getElementById('modalTitle').innerText = 'Edit Task';
+        document.getElementById('newTaskCat').value = task.cat;
+        document.getElementById('newTaskText').value = task.text;
+        document.getElementById('newTaskPoints').value = task.p;
+        document.getElementById('newTaskType').value = task.type;
+        
+        document.getElementById('addModal').style.display = 'flex';
+    }
+
+    window.closeModal = function() {
+        document.getElementById('addModal').style.display = 'none';
+    }
+
+    window.saveTask = function() {
+        const text = document.getElementById('newTaskText').value;
+        const points = parseInt(document.getElementById('newTaskPoints').value) || 0;
+        const type = document.getElementById('newTaskType').value;
+        const cat = document.getElementById('newTaskCat').value;
+
+        if (!text) {
+            alert("Task description is required.");
+            return;
+        }
+
+        if (editingId) {
+            // Update existing
+            const idx = state.customTasks.findIndex(t => t.id === editingId);
+            if (idx !== -1) {
+                state.customTasks[idx] = { ...state.customTasks[idx], text, p: points, type, cat };
+                console.log("Updated task:", state.customTasks[idx]);
+            } else {
+                console.error("Could not find task to update with id:", editingId);
+            }
+        } else {
+            // Create new
+            const newTask = {
+                id: 'custom_' + Date.now(),
+                text: text,
+                p: points,
+                cat: cat,
+                type: type
+            };
+            state.customTasks.push(newTask);
+            console.log("Created new task:", newTask);
+        }
+
+        save(); 
+        mergeTasks();
+        render();
+        closeModal();
+    }
+    
+    window.deleteTask = function(id) {
+        if(!confirm("Delete this task?")) return;
+        state.customTasks = state.customTasks.filter(t => t.id !== id);
+        // Also clean up state
+        delete state[id];
+        
+        save();
+        mergeTasks();
+        render();
+        console.log("Deleted task:", id);
+    }
   </script>
-  </body>
-  </html>
+</body>
+</html>
