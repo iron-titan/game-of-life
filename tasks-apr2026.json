@@ -1,0 +1,25 @@
+[
+  { "id": "apr26_habit_social_1", "text": "No social media (Morning)", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "apr26_habit_journal_1", "text": "Achievement Journal", "p": 200, "cat": "side", "type": "repeatable" },
+  { "id": "apr26_habit_study_1", "text": "Study/Video 2h", "p": 300, "cat": "pmp", "type": "repeatable" },
+  { "id": "apr26_habit_meals_1", "text": "Meal with protein", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "apr26_habit_supp_1", "text": "Supplements", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "apr26_gym_week", "text": "Gym 3x/week complete", "p": 1000, "cat": "side", "type": "repeatable" },
+
+  { "id": "apr26_money_30", "text": "Runway 30% ($2100)", "p": 2500, "cat": "money", "type": "once" },
+  { "id": "apr26_money_60", "text": "Runway 60% ($4200)", "p": 4000, "cat": "money", "type": "once" },
+  { "id": "apr26_money_85", "text": "Runway 85% ($5950)", "p": 6000, "cat": "money", "type": "once" },
+  { "id": "apr26_money_100", "text": "Runway 100% ($7000)", "p": 10000, "cat": "money", "type": "once" },
+  { "id": "apr26_money_debt", "text": "Debt Repayment / Tax / Savings", "p": 6000, "cat": "money", "type": "once" },
+
+  { "id": "apr26_eggs_complete", "text": "EGGS SHIP COMPLETE (Clinic Arrived)", "p": 15000, "cat": "port", "type": "once" },
+  
+  { "id": "apr26_job_fet", "text": "Job: FET Insurance Confirmed", "p": 10000, "cat": "money", "type": "once" },
+  
+  { "id": "apr26_tech_stack", "text": "Supabase / Docker / Bayesboard Beta", "p": 8000, "cat": "port", "type": "once" },
+  { "id": "apr26_cert_gh_pending", "text": "GH Actions Cert (If Pending)", "p": 5000, "cat": "port", "type": "once" },
+
+  { "id": "apr26_deduct_knit", "text": "Deduction: Knitting >1h", "p": -500, "cat": "side", "type": "repeatable" },
+  { "id": "apr26_deduct_resched", "text": "Deduction: Lazy Reschedule", "p": -250, "cat": "side", "type": "repeatable" },
+  { "id": "apr26_deduct_late", "text": "Deduction: Up past 3am", "p": -500, "cat": "side", "type": "repeatable" }
+]

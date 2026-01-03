@@ -1,0 +1,41 @@
+[
+  { "id": "feb26_habit_social_1", "text": "No social media (Morning)", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_habit_social_streak10", "text": "No socials 10-day streak", "p": 300, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 10 } },
+  { "id": "feb26_habit_social_streak20", "text": "No socials 20-day streak", "p": 500, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 20 } },
+
+  { "id": "feb26_habit_journal_1", "text": "Achievement Journal", "p": 200, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_habit_journal_streak10", "text": "Journal 10-day streak", "p": 300, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 10 } },
+  { "id": "feb26_habit_journal_streak20", "text": "Journal 20-day streak", "p": 500, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 20 } },
+
+  { "id": "feb26_habit_study_1", "text": "Study/Video 2h", "p": 300, "cat": "pmp", "type": "repeatable" },
+  { "id": "feb26_habit_meals_1", "text": "Meal with protein", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_habit_supp_1", "text": "Supplements", "p": 100, "cat": "side", "type": "repeatable" },
+  
+  { "id": "feb26_drive_lesson", "text": "Driving Lesson (each)", "p": 1000, "cat": "side", "type": "repeatable" },
+  
+  { "id": "feb26_gym_week", "text": "Gym 3x/week complete", "p": 1000, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_gym_streak4", "text": "Gym 4-week streak", "p": 5000, "cat": "side", "type": "once" },
+
+  { "id": "feb26_money_30", "text": "Runway 30% ($1200)", "p": 2500, "cat": "money", "type": "once" },
+  { "id": "feb26_money_60", "text": "Runway 60% ($2400)", "p": 4000, "cat": "money", "type": "once" },
+  { "id": "feb26_money_85", "text": "Runway 85% ($3400)", "p": 6000, "cat": "money", "type": "once" },
+  { "id": "feb26_money_100", "text": "Runway 100% ($4000)", "p": 10000, "cat": "money", "type": "once" },
+  
+  { "id": "feb26_job_ramp", "text": "Job Apps Ramp (10-15 targeted)", "p": 4000, "cat": "money", "type": "repeatable" },
+  { "id": "feb26_job_interview_prac", "text": "Practice Interview", "p": 600, "cat": "money", "type": "repeatable" },
+  
+  { "id": "feb26_cert_gh", "text": "GitHub Certs (Fundamentals + Actions)", "p": 9000, "cat": "port", "type": "once" },
+  { "id": "feb26_eggs_consult", "text": "Eggs: Clinic Consults / Quotes", "p": 3000, "cat": "port", "type": "once" },
+  
+  { "id": "feb26_side_amoeba", "text": "Amoeba Sale Prep (3 Days)", "p": 8000, "cat": "side", "type": "once" },
+  { "id": "feb26_side_domainenv", "text": "Domainenv Automation (2 Days)", "p": 7000, "cat": "side", "type": "once" },
+  
+  { "id": "feb26_net_low", "text": "Networking: 3-4 interactions", "p": 400, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_net_mid", "text": "Networking: 4-6 interactions", "p": 1600, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_net_high", "text": "Networking: 7-10 interactions", "p": 2000, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_net_person", "text": "Networking: In-person", "p": 1000, "cat": "side", "type": "repeatable" },
+  
+  { "id": "feb26_deduct_knit", "text": "Deduction: Knitting >1h", "p": -500, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_deduct_resched", "text": "Deduction: Lazy Reschedule", "p": -250, "cat": "side", "type": "repeatable" },
+  { "id": "feb26_deduct_late", "text": "Deduction: Up past 3am", "p": -500, "cat": "side", "type": "repeatable" }
+]
