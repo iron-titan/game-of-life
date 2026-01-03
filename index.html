@@ -209,8 +209,8 @@
   let state = {};     // Loaded from specific month storage
   let editingId = null;
 
-  // --- HABITS DEFINITION (Global for now, but icons are generic) ---
-  const HABITS = [
+  // --- HABITS DEFINITION ---
+  const DEFAULT_HABITS = [
     { id: 'pmp', label: 'PMP Study', icon: '📚' },
     { id: 'gym', label: 'Gym', icon: '💪' },
     { id: 'sleep', label: 'Sleep', icon: '😴' },
@@ -219,8 +219,10 @@
     { id: 'journal', label: 'Journal', icon: '✍️' }
   ];
 
+  let currentHabits = [];
+
   const getHabitIcon = (id) => {
-      const h = HABITS.find(x => x.id === id);
+      const h = currentHabits.find(x => x.id === id);
       return h ? h.icon : '✅';
   };
 
@@ -234,7 +236,6 @@
       });
       selectorHtml += `</select>`;
       
-      // Inject selector if not exists, or replace
       let selContainer = document.getElementById('monthSelectorContainer');
       if(!selContainer) {
           selContainer = document.createElement('div');
@@ -246,6 +247,12 @@
       document.getElementById('monthSelector').addEventListener('change', (e) => {
           switchMonth(e.target.value);
       });
+      
+      // Inject Manage Habits Button
+      const calHeader = document.querySelector('.calendar-header');
+      if (!calHeader.querySelector('.settings-btn')) {
+          calHeader.innerHTML += ` <span class="settings-btn" onclick="openHabitManager()" style="cursor:pointer; font-size:0.8em; opacity:0.6;">⚙️</span>`;
+      }
 
       // 2. Load Data
       loadMonthData();
@@ -260,15 +267,13 @@
   }
 
   function loadMonthData() {
-      // Load State from scoped LocalStorage
       const storageKey = `oksanaLifeState_${currentMonthId}`;
       state = JSON.parse(localStorage.getItem(storageKey) || "{}");
       
-      // Migration for old December data (if user had data in 'oksanaLifeState' global)
+      // Migration for old December data
       if (currentMonthId === 'dec2025' && Object.keys(state).length === 0) {
           const oldGlobal = localStorage.getItem("oksanaLifeState");
           if (oldGlobal) {
-              console.log("Migrating legacy December data...");
               state = JSON.parse(oldGlobal);
               localStorage.setItem(storageKey, JSON.stringify(state));
           }
@@ -276,13 +281,18 @@
 
       if (!state.calendar) state.calendar = {};
       if (!state.customTasks) state.customTasks = [];
+      
+      // Initialize Habits from Default if missing
+      if (!state.habits || state.habits.length === 0) {
+          state.habits = [...DEFAULT_HABITS];
+      }
+      currentHabits = state.habits;
 
-      // Update UI Header
-      document.querySelector('h1').innerText = "Oksana's Game of Life"; // Keep generic
       document.querySelector('.subtitle').innerText = currentConfig.label;
-      document.querySelector('.calendar-header').innerText = currentConfig.label;
+      // Preserve the settings button when updating text
+      const calHeader = document.querySelector('.calendar-header');
+      calHeader.innerHTML = `${currentConfig.label} <span class="settings-btn" onclick="openHabitManager()" style="cursor:pointer; font-size:0.8em; opacity:0.6;">⚙️</span>`;
 
-      // Load JSON
       fetch(currentConfig.file)
         .then(r => r.json())
         .then(data => {
@@ -298,7 +308,128 @@
         });
   }
   
-  // ... Rest of the functions (mergeTasks, toggle, calculateStreaks, etc.) need small tweaks to use currentConfig ...
+  // ... (Rest of functions) ...
+
+  // --- HABIT MANAGER LOGIC ---
+  window.openHabitManager = function() {
+      const modal = document.getElementById('habitModal');
+      if (!modal) createHabitModal();
+      renderHabitManager();
+      document.getElementById('habitModal').style.display = 'flex';
+  }
+
+  function createHabitModal() {
+      const div = document.createElement('div');
+      div.id = 'habitModal';
+      div.className = 'modal-overlay';
+      div.innerHTML = `
+        <div class="modal" style="max-width:500px;">
+            <h3>Manage Habits</h3>
+            <div id="habitList" style="max-height:300px; overflow-y:auto; margin-bottom:20px; border:1px solid #eee; padding:10px; border-radius:8px;"></div>
+            
+            <div style="border-top:1px solid #eee; padding-top:15px;">
+                <h4>Add New Habit</h4>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="newHabitIcon" placeholder="Icon (🧘)" style="width:60px;">
+                    <input type="text" id="newHabitLabel" placeholder="Label (e.g. Meditation)">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <label><input type="radio" name="habitScope" value="current" checked> This Month Only</label><br>
+                    <label><input type="radio" name="habitScope" value="future"> This + All Future Months</label>
+                </div>
+                <button class="btn-primary" style="width:100%" onclick="addNewHabit()">Add Habit</button>
+            </div>
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn-secondary" onclick="document.getElementById('habitModal').style.display='none'">Close</button>
+            </div>
+        </div>
+      `;
+      document.body.appendChild(div);
+  }
+
+  function renderHabitManager() {
+      const list = document.getElementById('habitList');
+      list.innerHTML = '';
+      currentHabits.forEach(h => {
+          const row = document.createElement('div');
+          row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #f0f0f0;";
+          row.innerHTML = `
+            <span><span style="font-size:1.2em; margin-right:10px;">${h.icon}</span> ${h.label}</span>
+            <div style="display:flex; gap:5px;">
+                 <button class="control-btn delete" style="width:24px; height:24px; font-size:0.8rem;" onclick="deleteHabit('${h.id}', 'current')" title="Delete from this month">1</button>
+                 <button class="control-btn delete" style="width:24px; height:24px; font-size:0.8rem; border-color:red; color:red;" onclick="deleteHabit('${h.id}', 'future')" title="Delete from all future months too">All</button>
+            </div>
+          `;
+          list.appendChild(row);
+      });
+  }
+
+  window.addNewHabit = function() {
+      const icon = document.getElementById('newHabitIcon').value || '✨';
+      const label = document.getElementById('newHabitLabel').value;
+      const scope = document.querySelector('input[name="habitScope"]:checked').value;
+
+      if (!label) return alert("Label is required");
+
+      const newHabit = { id: 'custom_habit_' + Date.now(), label, icon };
+      
+      // 1. Add to current
+      state.habits.push(newHabit);
+      save();
+
+      // 2. Future
+      if (scope === 'future') {
+          applyToFutureMonths(s => {
+              if (!s.habits) s.habits = [...DEFAULT_HABITS];
+              s.habits.push(newHabit);
+              return s;
+          });
+          alert("Habit added to this and all future months!");
+      }
+
+      document.getElementById('newHabitIcon').value = '';
+      document.getElementById('newHabitLabel').value = '';
+      renderHabitManager();
+      renderHabitPanel(); // Refresh UI background
+  }
+
+  window.deleteHabit = function(id, scope) {
+      if(!confirm("Delete this habit?")) return;
+
+      // 1. Delete from current
+      state.habits = state.habits.filter(h => h.id !== id);
+      save();
+
+      // 2. Future
+      if (scope === 'future') {
+          applyToFutureMonths(s => {
+              if (s.habits) {
+                  s.habits = s.habits.filter(h => h.id !== id);
+              }
+              return s;
+          });
+          alert("Habit deleted from all future months.");
+      }
+
+      renderHabitManager();
+      renderHabitPanel();
+  }
+
+  function applyToFutureMonths(callback) {
+      const currentIdx = MONTHS.findIndex(m => m.id === currentMonthId);
+      if (currentIdx === -1) return;
+
+      for (let i = currentIdx + 1; i < MONTHS.length; i++) {
+          const m = MONTHS[i];
+          const key = `oksanaLifeState_${m.id}`;
+          let s = JSON.parse(localStorage.getItem(key) || "{}");
+          
+          // Apply change
+          s = callback(s);
+          
+          localStorage.setItem(key, JSON.stringify(s));
+      }
+  }
 
   function mergeTasks() {
       allTasks = [...baseTasks, ...state.customTasks];
@@ -410,7 +541,7 @@
       div.className = 'cal-day';
 
       const habitsDone = state.calendar[dayStr] || [];
-      if (habitsDone.length >= 3) div.classList.add('perfect'); // Adjusted criteria
+      if (habitsDone.length >= Math.ceil(currentHabits.length * 0.7)) div.classList.add('perfect'); // Adjusted perfect logic
       if (selectedDate === dayStr) div.classList.add('active');
 
       const numSpan = document.createElement('span');
@@ -456,7 +587,7 @@
 
     const doneToday = state.calendar[selectedDate] || [];
 
-    HABITS.forEach(h => {
+    currentHabits.forEach(h => {
       const isDone = doneToday.includes(h.id);
       const btn = document.createElement('div');
       btn.className = `habit-btn ${isDone ? 'done' : ''}`;
