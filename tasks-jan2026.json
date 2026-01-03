@@ -1,0 +1,71 @@
+[
+  { "id": "jan26_habit_social_1", "text": "No social media (Morning)", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_habit_social_streak10", "text": "No socials 10-day streak", "p": 300, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 10 } },
+  { "id": "jan26_habit_social_streak20", "text": "No socials 20-day streak", "p": 500, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 20 } },
+  { "id": "jan26_habit_social_streak30", "text": "No socials 30-day streak", "p": 800, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 30 } },
+
+  { "id": "jan26_habit_journal_1", "text": "Achievement Journal", "p": 200, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_habit_journal_streak10", "text": "Journal 10-day streak", "p": 300, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 10 } },
+  { "id": "jan26_habit_journal_streak20", "text": "Journal 20-day streak", "p": 500, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 20 } },
+  { "id": "jan26_habit_journal_streak30", "text": "Journal 30-day streak", "p": 800, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 30 } },
+
+  { "id": "jan26_habit_study_1", "text": "Study/Video 2h", "p": 300, "cat": "pmp", "type": "repeatable" },
+  
+  { "id": "jan26_habit_meals_1", "text": "Meal with protein", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_habit_supp_1", "text": "Supplements", "p": 100, "cat": "side", "type": "repeatable" },
+  
+  { "id": "jan26_drive_lesson", "text": "Driving Lesson (each)", "p": 1000, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_drive_goal", "text": "10 Driving Lessons Goal", "p": 5000, "cat": "side", "type": "once" },
+  
+  { "id": "jan26_gym_week", "text": "Gym 3x/week complete", "p": 1000, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_gym_streak4", "text": "Gym 4-week streak", "p": 5000, "cat": "side", "type": "once" },
+
+  { "id": "jan26_pmp_exam1", "text": "Practice Exam 1 (Complete)", "p": 2000, "cat": "pmp", "type": "once" },
+  { "id": "jan26_pmp_exam1_bonus", "text": "Practice Exam 1 (>75%)", "p": 3000, "cat": "pmp", "type": "once" },
+  { "id": "jan26_pmp_exam2", "text": "Practice Exam 2 (Complete)", "p": 2000, "cat": "pmp", "type": "once" },
+  { "id": "jan26_pmp_exam2_bonus", "text": "Practice Exam 2 (>75%)", "p": 3000, "cat": "pmp", "type": "once" },
+  { "id": "jan26_pmp_exam3", "text": "Practice Exam 3 (Complete)", "p": 2000, "cat": "pmp", "type": "once" },
+  { "id": "jan26_pmp_exam3_bonus", "text": "Practice Exam 3 (>75%)", "p": 3000, "cat": "pmp", "type": "once" },
+  { "id": "jan26_pmp_exam4", "text": "Practice Exam 4 (Complete)", "p": 2000, "cat": "pmp", "type": "once" },
+  { "id": "jan26_pmp_exam4_bonus", "text": "Practice Exam 4 (>75%)", "p": 3000, "cat": "pmp", "type": "once" },
+
+  { "id": "jan26_money_30", "text": "Runway 30% ($540)", "p": 2500, "cat": "money", "type": "once" },
+  { "id": "jan26_money_60", "text": "Runway 60% ($1080)", "p": 4000, "cat": "money", "type": "once" },
+  { "id": "jan26_money_85", "text": "Runway 85% ($1530)", "p": 6000, "cat": "money", "type": "once" },
+  { "id": "jan26_money_100", "text": "Runway 100% ($1800)", "p": 10000, "cat": "money", "type": "once" },
+  
+  { "id": "jan26_upwork_low", "text": "Upwork Apps 1-3/day", "p": 1000, "cat": "money", "type": "repeatable" },
+  { "id": "jan26_upwork_mid", "text": "Upwork Apps 4-6/day", "p": 1600, "cat": "money", "type": "repeatable" },
+  { "id": "jan26_upwork_high", "text": "Upwork Apps 7-10/day", "p": 2500, "cat": "money", "type": "repeatable" },
+  { "id": "jan26_job_simple", "text": "Targeted Job App (Simple)", "p": 600, "cat": "money", "type": "repeatable" },
+  { "id": "jan26_job_complex", "text": "Targeted Job App (Complex)", "p": 2000, "cat": "money", "type": "repeatable" },
+  
+  { "id": "jan26_port_update", "text": "Portfolio: LinkedIn/Backlog Update", "p": 5000, "cat": "port", "type": "once" },
+  { "id": "jan26_bayes_backlog", "text": "Bayesboard: Update Backlog", "p": 2000, "cat": "port", "type": "once" },
+  { "id": "jan26_bayes_vid_scaling", "text": "Bayesboard: Watch Scaling Video", "p": 2000, "cat": "port", "type": "once" },
+  { "id": "jan26_bayes_vid_supa", "text": "Bayesboard: Watch Supabase Video", "p": 2000, "cat": "port", "type": "once" },
+  { "id": "jan26_port_gaps", "text": "Portfolio: Identify PM Gaps", "p": 2000, "cat": "port", "type": "once" },
+  { "id": "jan26_port_criteria", "text": "Portfolio: Implementation Criteria", "p": 3000, "cat": "port", "type": "once" },
+  
+  { "id": "jan26_yt_strat", "text": "YouTube: Formalize Strategy", "p": 1000, "cat": "port", "type": "once" },
+  { "id": "jan26_yt_jira", "text": "YouTube: PM Plan in Jira", "p": 1000, "cat": "port", "type": "once" },
+  { "id": "jan26_yt_plan", "text": "YouTube: Content Plan (8 videos)", "p": 1000, "cat": "port", "type": "once" },
+  { "id": "jan26_yt_vid1", "text": "YouTube: Post Video 1", "p": 1000, "cat": "port", "type": "once" },
+  { "id": "jan26_yt_vid2", "text": "YouTube: Post Video 2", "p": 1000, "cat": "port", "type": "once" },
+  
+  { "id": "jan26_sudoma_landing", "text": "SudomaConsulting: Simple Landing", "p": 2000, "cat": "port", "type": "once" },
+  
+  { "id": "jan26_side_crypto", "text": "Crypto Snitch Prototype (1 Day)", "p": 8000, "cat": "side", "type": "once" },
+  { "id": "jan26_side_amoeba", "text": "Amoeba Book Scope/Prep (5 Days)", "p": 7000, "cat": "side", "type": "once" },
+  { "id": "jan26_side_domain", "text": "Domains Flip (1 Day)", "p": 7000, "cat": "side", "type": "once" },
+  { "id": "jan26_side_automation", "text": "Domainenv Automation (1 Day)", "p": 3000, "cat": "side", "type": "once" },
+  
+  { "id": "jan26_deduct_knit", "text": "Deduction: Knitting >1h", "p": -500, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_deduct_resched", "text": "Deduction: Lazy Reschedule", "p": -250, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_deduct_late", "text": "Deduction: Up past 3am", "p": -500, "cat": "side", "type": "repeatable" },
+  
+  { "id": "jan26_net_low", "text": "Networking: 3-4 interactions", "p": 400, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_net_mid", "text": "Networking: 4-6 interactions", "p": 1600, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_net_high", "text": "Networking: 7-10 interactions", "p": 2000, "cat": "side", "type": "repeatable" },
+  { "id": "jan26_net_person", "text": "Networking: In-person", "p": 1000, "cat": "side", "type": "repeatable" }
+]

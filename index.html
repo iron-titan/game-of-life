@@ -191,42 +191,111 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <script type="module">
+  // --- CONFIGURATION ---
+  const MONTHS = [
+    { id: 'dec2025', label: 'Level 1: Dec 2025', file: 'tasks-dec2025.json', year: 2025, month: 11, days: 31, target: 48720 },
+    { id: 'jan2026', label: 'Level 2: Jan 2026', file: 'tasks-jan2026.json', year: 2026, month: 0, days: 31, target: 35000 }
+  ];
+  
+  // Default to latest month, or load from URL/Storage
+  let currentMonthId = localStorage.getItem("oksanaLifeCurrentMonth") || 'jan2026';
+  let currentConfig = MONTHS.find(m => m.id === currentMonthId) || MONTHS[1];
+
   let baseTasks = []; // From JSON
   let allTasks = [];  // Merged
-  let state = JSON.parse(localStorage.getItem("oksanaLifeState") || "{}");
-  let editingId = null; // Track if we are editing
-  
-  if (!state.calendar) state.calendar = {}; 
-  if (!state.customTasks) state.customTasks = []; // Array of {id, text, p, cat, type}
+  let state = {};     // Loaded from specific month storage
+  let editingId = null;
 
+  // --- HABITS DEFINITION (Global for now, but icons are generic) ---
   const HABITS = [
-    { id: 'pmp', label: 'PMP Study (2h)', icon: '📚' },
-    { id: 'gym', label: 'Gym / Workout', icon: '💪' },
-    { id: 'sleep', label: 'Sleep Schedule', icon: '😴' },
+    { id: 'pmp', label: 'PMP Study', icon: '📚' },
+    { id: 'gym', label: 'Gym', icon: '💪' },
+    { id: 'sleep', label: 'Sleep', icon: '😴' },
     { id: 'supplements', label: 'Supplements', icon: '💊' },
-    { id: 'bank', label: 'Bank Login', icon: '🏦' },
-    { id: 'calendar', label: 'Calendar Check', icon: '📅' }
+    { id: 'social', label: 'No Socials', icon: '📵' },
+    { id: 'journal', label: 'Journal', icon: '✍️' }
   ];
 
   const getHabitIcon = (id) => {
       const h = HABITS.find(x => x.id === id);
-      return h ? h.icon : '';
+      return h ? h.icon : '✅';
   };
 
-  // Load tasks
-  fetch('tasks.json')
-    .then(r => r.json())
-    .then(data => {
-      baseTasks = data;
-      mergeTasks();
-      checkAutoCompletions();
-      render();
-      renderCalendar();
-    })
-    .catch(e => {
-        console.error(e);
-        alert("Error loading tasks.json! Check console.");
-    });
+  // --- INITIALIZATION ---
+  function init() {
+      // 1. Render Month Selector
+      const subtitle = document.querySelector('.subtitle');
+      let selectorHtml = `<select id="monthSelector" style="margin-top:10px; padding:5px; border-radius:5px;">`;
+      MONTHS.forEach(m => {
+          selectorHtml += `<option value="${m.id}" ${m.id === currentMonthId ? 'selected' : ''}>${m.label}</option>`;
+      });
+      selectorHtml += `</select>`;
+      
+      // Inject selector if not exists, or replace
+      let selContainer = document.getElementById('monthSelectorContainer');
+      if(!selContainer) {
+          selContainer = document.createElement('div');
+          selContainer.id = 'monthSelectorContainer';
+          subtitle.insertAdjacentElement('afterend', selContainer);
+      }
+      selContainer.innerHTML = selectorHtml;
+
+      document.getElementById('monthSelector').addEventListener('change', (e) => {
+          switchMonth(e.target.value);
+      });
+
+      // 2. Load Data
+      loadMonthData();
+  }
+
+  function switchMonth(monthId) {
+      console.log("Switching to", monthId);
+      currentMonthId = monthId;
+      localStorage.setItem("oksanaLifeCurrentMonth", currentMonthId);
+      currentConfig = MONTHS.find(m => m.id === currentMonthId);
+      loadMonthData();
+  }
+
+  function loadMonthData() {
+      // Load State from scoped LocalStorage
+      const storageKey = `oksanaLifeState_${currentMonthId}`;
+      state = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      
+      // Migration for old December data (if user had data in 'oksanaLifeState' global)
+      if (currentMonthId === 'dec2025' && Object.keys(state).length === 0) {
+          const oldGlobal = localStorage.getItem("oksanaLifeState");
+          if (oldGlobal) {
+              console.log("Migrating legacy December data...");
+              state = JSON.parse(oldGlobal);
+              localStorage.setItem(storageKey, JSON.stringify(state));
+          }
+      }
+
+      if (!state.calendar) state.calendar = {};
+      if (!state.customTasks) state.customTasks = [];
+
+      // Update UI Header
+      document.querySelector('h1').innerText = "Oksana's Game of Life"; // Keep generic
+      document.querySelector('.subtitle').innerText = currentConfig.label;
+      document.querySelector('.calendar-header').innerText = currentConfig.label;
+
+      // Load JSON
+      fetch(currentConfig.file)
+        .then(r => r.json())
+        .then(data => {
+            baseTasks = data;
+            mergeTasks();
+            checkAutoCompletions();
+            render();
+            renderCalendar();
+        })
+        .catch(e => {
+            console.error(e);
+            alert(`Error loading ${currentConfig.file}`);
+        });
+  }
+  
+  // ... Rest of the functions (mergeTasks, toggle, calculateStreaks, etc.) need small tweaks to use currentConfig ...
 
   function mergeTasks() {
       allTasks = [...baseTasks, ...state.customTasks];
@@ -255,18 +324,23 @@
 
   // --- STREAK LOGIC ---
   function calculateStreaks(habitId) {
-      const dates = Object.keys(state.calendar).sort();
-      let currentStreak = 0;
+      // Use currentConfig.year and currentConfig.month
+      const start = new Date(currentConfig.year, currentConfig.month, 1);
+      const end = new Date(currentConfig.year, currentConfig.month, currentConfig.days);
+      
       let maxStreak = 0;
-      
-      const start = new Date(2025, 11, 1); // Dec 1
-      const end = new Date(2025, 11, 31);
-      
       let tempStreak = 0;
+      
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          const dateStr = d.toISOString().split('T')[0];
-          const done = (state.calendar[dateStr] || []).includes(habitId);
+          // Format as YYYY-MM-DD local
+          // Simplified date string generation to avoid timezone issues
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          const dateStr = `${y}-${m}-${day}`;
           
+          const done = (state.calendar[dateStr] || []).includes(habitId);
+
           if (done) {
               tempStreak++;
           } else {
@@ -315,15 +389,25 @@
       grid.appendChild(div);
     });
 
-    grid.appendChild(document.createElement('div')); // Empty Sunday
+    // Determine start day of week
+    const firstDay = new Date(currentConfig.year, currentConfig.month, 1).getDay(); // 0-6
+    
+    // Empty slots for start
+    for(let i=0; i<firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
+    }
 
-    for (let i = 1; i <= 31; i++) {
-      const dayStr = `2025-12-${i.toString().padStart(2, '0')}`;
+    for (let i = 1; i <= currentConfig.days; i++) {
+      const y = currentConfig.year;
+      const m = String(currentConfig.month + 1).padStart(2, '0');
+      const d = String(i).padStart(2, '0');
+      const dayStr = `${y}-${m}-${d}`;
+
       const div = document.createElement('div');
       div.className = 'cal-day';
 
       const habitsDone = state.calendar[dayStr] || [];
-      if (habitsDone.length === HABITS.length) div.classList.add('perfect');
+      if (habitsDone.length >= 3) div.classList.add('perfect'); // Adjusted criteria
       if (selectedDate === dayStr) div.classList.add('active');
 
       const numSpan = document.createElement('span');
@@ -364,7 +448,7 @@
     }
 
     panel.style.display = 'block';
-    title.innerText = `Habits for Dec ${selectedDate.split('-')[2]}`;
+    title.innerText = `Habits for ${selectedDate}`;
     grid.innerHTML = '';
 
     const doneToday = state.calendar[selectedDate] || [];
@@ -383,7 +467,7 @@
           state.calendar[selectedDate] = [...current, h.id];
           confetti({particleCount: 40, spread: 40, origin: {y: 0.7}});
         }
-        save(); 
+        save();
       };
 
       grid.appendChild(btn);
@@ -391,18 +475,53 @@
   }
 
   function save() {
-    // Check for auto-completions before saving
     checkAutoCompletions();
-    localStorage.setItem("oksanaLifeState", JSON.stringify(state));
+    const storageKey = `oksanaLifeState_${currentMonthId}`;
+    localStorage.setItem(storageKey, JSON.stringify(state));
     render();
     renderCalendar();
     renderHabitPanel();
   }
+  
+  // Backup Functions
+  window.exportData = function() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href",     dataStr);
+      downloadAnchorNode.setAttribute("download", `oksana_life_backup_${currentMonthId}.json`);
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+  }
+  
+  window.importData = function() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = e => {
+         const file = e.target.files[0];
+         const reader = new FileReader();
+         reader.readAsText(file,'UTF-8');
+         reader.onload = readerEvent => {
+            const content = readerEvent.target.result;
+            try {
+                const parsed = JSON.parse(content);
+                if(confirm(`Overwrite current month (${currentMonthId}) data with imported data?`)) {
+                    state = parsed;
+                    save();
+                    alert("Import successful!");
+                }
+            } catch(err) {
+                alert("Invalid JSON file");
+            }
+         }
+      }
+      input.click();
+  }
 
     function render() {
-      console.log("Rendering tasks. Total:", allTasks.length);
-      console.log("Custom tasks count:", state.customTasks.length);
-
+      // console.log("Rendering tasks. Total:", allTasks.length);
+      
       let total = 0, pmp=0, money=0, port=0;
 
       const containers = {
@@ -412,14 +531,13 @@
           side: document.getElementById('sideTasks')
       };
 
-      // Clear containers
       Object.values(containers).forEach(el => el.innerHTML = '');
 
       allTasks.forEach(t => {
         const isRepeatable = t.type === "repeatable";
         const earned = (isRepeatable ? (state[t.id]||0) * t.p : (state[t.id]?t.p:0));
 
-        if (earned > 0) {
+        if (earned !== 0) { // Allow negative points
           total += earned;
           if (t.cat==="pmp") pmp += earned;
           if (t.cat==="money") money += earned;
@@ -429,14 +547,10 @@
         const div = document.createElement('div');
         div.className = `task ${state[t.id] ? 'done' : ''} ${isRepeatable ? 'repeatable' : ''}`;
 
-        // Task Content Construction
-        // Left Side: Text + Points
-        // Right Side: Action (Checkbox/Counter) + Controls (Edit/Delete)
-        
-        const leftHtml = `<span>${t.text} <b>+${t.p}p</b></span>`;
-        
+        const leftHtml = `<span>${t.text} <b>${t.p > 0 ? '+' : ''}${t.p}p</b></span>`;
+
         let rightHtml = '';
-        
+
         if (isRepeatable) {
             const count = state[t.id] || 0;
             rightHtml += `
@@ -453,7 +567,6 @@
             `;
         }
 
-        // Add Edit/Delete controls for custom tasks
         if (t.id.toString().startsWith('custom_')) {
             rightHtml += `
             <div class="task-controls">
@@ -462,34 +575,25 @@
             </div>
             `;
         }
-        
-        // Wrap right side
+
         div.innerHTML = `${leftHtml}<div style="display:flex; align-items:center; gap:10px;">${rightHtml}</div>`;
 
-        // Programmatically attach event listeners for custom controls
+        // Event listeners for custom controls
         if (t.id.toString().startsWith('custom_')) {
             const controlsDiv = div.querySelector('.task-controls');
             const editBtn = div.querySelector('.control-btn.edit');
             const deleteBtn = div.querySelector('.control-btn.delete');
 
-            if (controlsDiv) {
-                controlsDiv.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
-            }
-
+            if (controlsDiv) controlsDiv.addEventListener('click', (e) => e.stopPropagation());
             if (editBtn) {
                 editBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    console.log("Edit clicked for", t.id);
                     window.openEditTask(t.id);
                 });
             }
-
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    console.log("Delete clicked for", t.id);
                     window.deleteTask(t.id);
                 });
             }
@@ -497,7 +601,6 @@
 
         if (!isRepeatable) {
           div.onclick = (e) => {
-            // Check if click was on controls or checkbox
             if (e.target.type !== 'checkbox' && !e.target.closest('.task-controls') && !e.target.closest('.counter-controls')) {
                  const cb = div.querySelector('input[type="checkbox"]');
                  if (cb) cb.click();
@@ -505,16 +608,15 @@
           };
         }
 
-        if (t.cat==="pmp") document.getElementById('pmpTasks').appendChild(div);
-        else if (t.cat==="money") document.getElementById('moneyTasks').appendChild(div);
-        else if (t.cat==="port") document.getElementById('portTasks').appendChild(div);
-        else document.getElementById('sideTasks').appendChild(div);
+        const targetContainer = containers[t.cat] || containers['side'];
+        targetContainer.appendChild(div);
       });
 
-      const percent = Math.min(100, Math.round(total / 48720 * 100));
+      const targetXP = currentConfig.target || 30000;
+      const percent = Math.min(100, Math.round(total / targetXP * 100));
       const fill = document.getElementById('xpFill');
       fill.style.width = percent + "%";
-      fill.textContent = `${total.toLocaleString()} / 48 720 xp · ${percent}%`;
+      fill.textContent = `${total.toLocaleString()} / ${targetXP.toLocaleString()} xp · ${percent}%`;
 
       document.getElementById('pmpScore').textContent = pmp.toLocaleString() + "p";
       document.getElementById('moneyScore').textContent = money.toLocaleString() + "p";
@@ -523,7 +625,6 @@
 
     // Modal Logic
     window.openAddTask = function(cat) {
-        console.log("openAddTask called for cat:", cat);
         editingId = null;
         document.getElementById('modalTitle').innerText = 'Add New Task';
         document.getElementById('newTaskCat').value = cat;
@@ -534,21 +635,16 @@
     }
 
     window.openEditTask = function(id) {
-        console.log("openEditTask called for id:", id);
         const task = state.customTasks.find(t => t.id === id);
-        if (!task) {
-            console.error("Task not found for editing:", id);
-            alert("Error: Task not found in custom tasks list.");
-            return;
-        }
-        
+        if (!task) return;
+
         editingId = id;
         document.getElementById('modalTitle').innerText = 'Edit Task';
         document.getElementById('newTaskCat').value = task.cat;
         document.getElementById('newTaskText').value = task.text;
         document.getElementById('newTaskPoints').value = task.p;
         document.getElementById('newTaskType').value = task.type;
-        
+
         document.getElementById('addModal').style.display = 'flex';
     }
 
@@ -568,16 +664,11 @@
         }
 
         if (editingId) {
-            // Update existing
             const idx = state.customTasks.findIndex(t => t.id === editingId);
             if (idx !== -1) {
                 state.customTasks[idx] = { ...state.customTasks[idx], text, p: points, type, cat };
-                console.log("Updated task:", state.customTasks[idx]);
-            } else {
-                console.error("Could not find task to update with id:", editingId);
             }
         } else {
-            // Create new
             const newTask = {
                 id: 'custom_' + Date.now(),
                 text: text,
@@ -586,26 +677,37 @@
                 type: type
             };
             state.customTasks.push(newTask);
-            console.log("Created new task:", newTask);
         }
 
-        save(); 
+        save();
         mergeTasks();
         render();
         closeModal();
     }
-    
+
     window.deleteTask = function(id) {
         if(!confirm("Delete this task?")) return;
         state.customTasks = state.customTasks.filter(t => t.id !== id);
-        // Also clean up state
         delete state[id];
-        
         save();
         mergeTasks();
         render();
-        console.log("Deleted task:", id);
     }
-  </script>
-</body>
+    
+    // Add Footer Controls
+    const footer = document.createElement('div');
+    footer.style.textAlign = 'center';
+    footer.style.marginTop = '50px';
+    footer.style.padding = '20px';
+    footer.style.opacity = '0.7';
+    footer.innerHTML = `
+      <button onclick="exportData()" class="btn-secondary">💾 Backup Data</button>
+      <button onclick="importData()" class="btn-secondary">📂 Restore Data</button>
+    `;
+    document.querySelector('.container').appendChild(footer);
+
+    // Boot
+    init();
+
+  </script></body>
 </html>
