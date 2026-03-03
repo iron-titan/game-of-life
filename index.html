@@ -13,6 +13,7 @@
     --dark: #00777b;
     --text: #2d1b1b;
     --deadline: #ff6b6b;
+    --study: #6366f1;
   }
   body {
     margin:0; padding:0; background:var(--bg); color:var(--text);
@@ -37,7 +38,7 @@
     background:var(--card); padding:0.9rem 1rem; border-radius:16px;
     display:flex; justify-content:space-between; align-items:center; cursor:pointer;
     transition:0.3s; font-size:1.05rem;
-    position: relative; /* Context for absolute controls if needed */
+    position: relative;
   }
 
   .task:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.1); }
@@ -47,7 +48,6 @@
   .side-quests h2 { color:white; text-align:center; display:flex; justify-content:center; align-items:center; gap:10px; }
   .count { font-size:0.9rem; color:#666; }
 
-  /* New styles for counter controls */
   .counter-controls { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.5); padding:4px 8px; border-radius:20px; }
   .btn-count {
     background: var(--accent); color:white; border:none; border-radius:50%;
@@ -58,21 +58,12 @@
   .btn-count:active { transform:scale(0.9); }
   .count-display { font-weight:bold; font-size:1.1rem; min-width:24px; text-align:center; color:var(--text); }
 
-  /* Task Controls (Edit/Delete) */
-  .task-controls { 
-      display:flex; gap:8px; margin-left:10px; align-items:center; 
-      z-index: 10; 
-      position: relative;
-  }
-  .control-btn { 
-      background: rgba(255,255,255,0.5); border:1px solid rgba(0,0,0,0.1); border-radius:6px; cursor:pointer; 
-      width: 32px; height: 32px; font-size: 1.1rem; transition:0.2s; display:flex; align-items:center; justify-content:center;
-  }
+  .task-controls { display:flex; gap:8px; margin-left:10px; align-items:center; z-index: 10; position: relative; }
+  .control-btn { background: rgba(255,255,255,0.5); border:1px solid rgba(0,0,0,0.1); border-radius:6px; cursor:pointer; width: 32px; height: 32px; font-size: 1.1rem; transition:0.2s; display:flex; align-items:center; justify-content:center; }
   .control-btn:hover { background: rgba(255,255,255,0.8); transform:scale(1.1); }
   .control-btn.delete { color: #d32f2f; border-color:#ffcdd2; }
   .control-btn.edit { color: #0277bd; border-color:#b3e5fc; }
 
-  /* Calendar Styles */
   .calendar-section { margin: 2rem 0; background: white; border-radius: 24px; padding: 1.5rem; border: 4px solid var(--teal); }
   .calendar-header { text-align: center; font-size: 1.5rem; color: var(--dark); margin-bottom: 1rem; font-weight: bold; }
   .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
@@ -87,23 +78,21 @@
   .cal-day.active { border-color: var(--accent); background: #fff0eb; }
   .cal-day.perfect { background: #c0e8d5; color: #005c4b; }
   .cal-day.has-deadline { border-color: var(--deadline); }
+  .cal-day.has-study { border-color: var(--study); }
 
   .day-deadline {
     position: absolute; bottom: 0; left: 0; right: 0;
     background: var(--deadline); color: white; font-size: 0.6rem;
     padding: 2px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+    z-index: 5;
   }
-
-  /* Mini Grid for Habit Emojis */
-  .day-habits {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2px;
-      margin-top: 4px;
-      width: 100%;
-      justify-items: center;
+  
+  .day-study-tag {
+    position: absolute; top: 0; left: 0;
+    background: var(--study); color: white; font-size: 0.5rem;
+    padding: 1px 4px; border-radius: 0 0 4px 0; font-weight: bold;
+    z-index: 5;
   }
-  .day-habit-icon { font-size: 0.8rem; line-height: 1; }
 
   .habit-panel {
     display: none; background: var(--card); padding: 1.5rem; border-radius: 16px; margin-top: 1rem;
@@ -120,11 +109,23 @@
   .habit-btn.done { background: var(--teal); color: white; border-color: var(--dark); }
   .habit-icon { font-size: 1.5rem; }
 
+  .study-check-card {
+    background: white; border: 2px solid var(--study); border-radius: 12px;
+    padding: 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; transition: 0.2s;
+  }
+  .study-check-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+  .study-check-card.done { background: #e0e7ff; opacity: 0.8; }
+  .study-check-card h4 { margin: 0; font-size: 0.9rem; color: var(--study); }
+  .study-check-card p { margin: 4px 0 0 0; font-size: 0.75rem; color: #666; }
+
+  .day-habits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; margin-top: 4px; width: 100%; justify-items: center; }
+  .day-habit-icon { font-size: 0.8rem; line-height: 1; }
+
   .deadline-input-container { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); }
   .deadline-input-container label { display: block; font-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 mb-2; }
   .deadline-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); font-family: inherit; font-size: 0.9rem; box-sizing: border-box; }
 
-  /* Modal */
   .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
   .modal { background:white; padding:2rem; border-radius:16px; width:90%; max-width:400px; border:4px solid var(--accent); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
   .modal h3 { margin-top:0; color:var(--dark); }
@@ -132,10 +133,8 @@
   .modal-btns { display:flex; gap:10px; justify-content:flex-end; }
   .btn-primary { padding:10px 20px; background:var(--teal); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
   .btn-secondary { padding:10px 20px; background:#eee; color:var(--text); border:none; border-radius:8px; cursor:pointer; }
-  
   .add-btn { cursor:pointer; font-size:0.7em; background:var(--accent); color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-left:10px; vertical-align:middle; }
   .add-btn:hover { transform:scale(1.1); }
-
 </style>
 </head>
 <body>
@@ -147,14 +146,12 @@
 <div class="container">
   <div class="xp-bar"><div class="xp-fill" id="xpFill">0 / 30 000 xp</div></div>
 
-  <!-- Calendar Section -->
   <div class="calendar-section">
     <div class="calendar-header">March 2026</div>
-    <div class="calendar-grid" id="calendarGrid">
-      <!-- Days injected by JS -->
-    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
 
     <div class="habit-panel" id="habitPanel">
+      <div id="studyPlanContainer"></div>
       <div class="habit-date-title" id="habitDateTitle"></div>
       <div class="habit-grid" id="habitGrid"></div>
       
@@ -189,7 +186,6 @@
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="addModal">
     <div class="modal">
         <h3 id="modalTitle">Add New Task</h3>
@@ -209,7 +205,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <script type="module">
-  // --- CONFIGURATION ---
   const MONTHS = [
     { id: 'dec2025', label: 'Level 1: Dec 2025', file: 'tasks-dec2025.json', year: 2025, month: 11, days: 31, target: 48720 },
     { id: 'jan2026', label: 'Level 2: Jan 2026 (Runway)', file: 'tasks-jan2026.json', year: 2026, month: 0, days: 31, target: 35000 },
@@ -218,16 +213,48 @@
     { id: 'apr2026', label: 'Level 2: Apr 2026 (Ship)', file: 'tasks-apr2026.json', year: 2026, month: 3, days: 30, target: 30000 }
   ];
   
-  // Default to latest month, or load from URL/Storage
   let currentMonthId = localStorage.getItem("oksanaLifeCurrentMonth") || 'mar2026';
   let currentConfig = MONTHS.find(m => m.id === currentMonthId) || MONTHS[3];
 
-  let baseTasks = []; // From JSON
-  let allTasks = [];  // Merged
-  let state = {};     // Loaded from specific month storage
+  let baseTasks = [];
+  let allTasks = [];
+  let state = {};
   let editingId = null;
 
-  // --- HABITS DEFINITION ---
+  const STUDY_PLAN = {
+    "2026-03-01": "Day 1: IT Security Fundamentals & Threats",
+    "2026-03-02": "Day 2: Vulnerabilities & Attack Signs",
+    "2026-03-03": "Day 3: Cryptography (1st half)",
+    "2026-03-04": "Day 4: Cryptography (2nd half)",
+    "2026-03-05": "Day 5: Social Engineering Protocols",
+    "2026-03-06": "Day 6: Security Architecture & Asset Security",
+    "2026-03-07": "Day 7: Data Protection & Principles",
+    "2026-03-08": "Day 8: Common Security Techniques",
+    "2026-03-09": "Day 9: Vulnerability Mgmt & Monitoring",
+    "2026-03-10": "Day 10: IAM (Identity Access Mgmt)",
+    "2026-03-11": "Day 11: Incident Response & Governance",
+    "2026-03-12": "Day 12: Risk & Vendor Management",
+    "2026-03-13": "Day 13: Physical Security & Resilience",
+    "2026-03-14": "Day 14: Security+ Labs: Environment",
+    "2026-03-15": "Day 15: Security+ Labs: Tools",
+    "2026-03-16": "Day 16: Security+ Labs: Analysis",
+    "2026-03-17": "Day 17: Security+ Labs: Hardening",
+    "2026-03-18": "Day 18: Security+ Labs: Audit",
+    "2026-03-19": "Day 19: Full Mock Exam #1",
+    "2026-03-20": "Day 20: Domain Review & Mock #2",
+    "2026-03-21": "Day 21: Full Mock Exam #3",
+    "2026-03-22": "Day 22: Domain Review & Mock #4",
+    "2026-03-23": "Day 23: Full Mock Exam #5",
+    "2026-03-24": "Day 24: Domain Review & Mock #6",
+    "2026-03-25": "Day 25: Final Mock & Weak Points",
+    "2026-03-26": "Day 26: Last Minute Cram #1",
+    "2026-03-27": "Day 27: Last Minute Cram #2",
+    "2026-03-28": "Day 28: PERFORMANCE READINESS CHECK",
+    "2026-03-29": "Day 29: Final Calm Review",
+    "2026-03-30": "Day 30: PRE-EXAM LOGISTICS",
+    "2026-03-31": "FINAL EXAM DEADLINE"
+  };
+
   const DEFAULT_HABITS = [
     { id: 'pmp', label: 'PMP Study', icon: '📚' },
     { id: 'gym', label: 'Gym', icon: '💪' },
@@ -244,9 +271,7 @@
       return h ? h.icon : '✅';
   };
 
-  // --- INITIALIZATION ---
   function init() {
-      // 1. Render Month Selector
       const subtitle = document.querySelector('.subtitle');
       let selectorHtml = `<select id="monthSelector" style="margin-top:10px; padding:5px; border-radius:5px;">`;
       MONTHS.forEach(m => {
@@ -266,18 +291,15 @@
           switchMonth(e.target.value);
       });
       
-      // Inject Manage Habits Button
       const calHeader = document.querySelector('.calendar-header');
       if (!calHeader.querySelector('.settings-btn')) {
           calHeader.innerHTML += ` <span class="settings-btn" onclick="openHabitManager()" style="cursor:pointer; font-size:0.8em; opacity:0.6;">⚙️</span>`;
       }
 
-      // 2. Load Data
       loadMonthData();
   }
 
   function switchMonth(monthId) {
-      console.log("Switching to", monthId);
       currentMonthId = monthId;
       localStorage.setItem("oksanaLifeCurrentMonth", currentMonthId);
       currentConfig = MONTHS.find(m => m.id === currentMonthId);
@@ -288,7 +310,6 @@
       const storageKey = `oksanaLifeState_${currentMonthId}`;
       state = JSON.parse(localStorage.getItem(storageKey) || "{}");
       
-      // Migration for old December data
       if (currentMonthId === 'dec2025' && Object.keys(state).length === 0) {
           const oldGlobal = localStorage.getItem("oksanaLifeState");
           if (oldGlobal) {
@@ -298,17 +319,16 @@
       }
 
       if (!state.calendar) state.calendar = {};
-      if (!state.deadlines) state.deadlines = {}; // Ensure deadlines object exists
+      if (!state.deadlines) state.deadlines = {};
+      if (!state.study) state.study = {}; // Study plan checkmarks
       if (!state.customTasks) state.customTasks = [];
       
-      // Initialize Habits from Default if missing
       if (!state.habits || state.habits.length === 0) {
           state.habits = [...DEFAULT_HABITS];
       }
       currentHabits = state.habits;
 
       document.querySelector('.subtitle').innerText = currentConfig.label;
-      // Preserve the settings button when updating text
       const calHeader = document.querySelector('.calendar-header');
       calHeader.innerHTML = `${currentConfig.label} <span class="settings-btn" onclick="openHabitManager()" style="cursor:pointer; font-size:0.8em; opacity:0.6;">⚙️</span>`;
 
@@ -327,7 +347,6 @@
         });
   }
 
-  // --- HABIT MANAGER LOGIC ---
   window.openHabitManager = function() {
       const modal = document.getElementById('habitModal');
       if (!modal) createHabitModal();
@@ -343,7 +362,6 @@
         <div class="modal" style="max-width:500px;">
             <h3>Manage Habits</h3>
             <div id="habitList" style="max-height:300px; overflow-y:auto; margin-bottom:20px; border:1px solid #eee; padding:10px; border-radius:8px;"></div>
-            
             <div style="border-top:1px solid #eee; padding-top:15px;">
                 <h4>Add New Habit</h4>
                 <div style="display:flex; gap:10px;">
@@ -385,49 +403,33 @@
       const icon = document.getElementById('newHabitIcon').value || '✨';
       const label = document.getElementById('newHabitLabel').value;
       const scope = document.querySelector('input[name="habitScope"]:checked').value;
-
       if (!label) return alert("Label is required");
-
       const newHabit = { id: 'custom_habit_' + Date.now(), label, icon };
-      
-      // 1. Add to current
       state.habits.push(newHabit);
       save();
-
-      // 2. Future
       if (scope === 'future') {
           applyToFutureMonths(s => {
               if (!s.habits) s.habits = [...DEFAULT_HABITS];
               s.habits.push(newHabit);
               return s;
           });
-          alert("Habit added to this and all future months!");
       }
-
       document.getElementById('newHabitIcon').value = '';
       document.getElementById('newHabitLabel').value = '';
       renderHabitManager();
-      renderHabitPanel(); // Refresh UI background
+      renderHabitPanel();
   }
 
   window.deleteHabit = function(id, scope) {
       if(!confirm("Delete this habit?")) return;
-
-      // 1. Delete from current
       state.habits = state.habits.filter(h => h.id !== id);
       save();
-
-      // 2. Future
       if (scope === 'future') {
           applyToFutureMonths(s => {
-              if (s.habits) {
-                  s.habits = s.habits.filter(h => h.id !== id);
-              }
+              if (s.habits) s.habits = s.habits.filter(h => h.id !== id);
               return s;
           });
-          alert("Habit deleted from all future months.");
       }
-
       renderHabitManager();
       renderHabitPanel();
   }
@@ -435,15 +437,11 @@
   function applyToFutureMonths(callback) {
       const currentIdx = MONTHS.findIndex(m => m.id === currentMonthId);
       if (currentIdx === -1) return;
-
       for (let i = currentIdx + 1; i < MONTHS.length; i++) {
           const m = MONTHS[i];
           const key = `oksanaLifeState_${m.id}`;
           let s = JSON.parse(localStorage.getItem(key) || "{}");
-          
-          // Apply change
           s = callback(s);
-          
           localStorage.setItem(key, JSON.stringify(s));
       }
   }
@@ -466,34 +464,20 @@
   window.changeCount = function(id, delta) {
     const current = state[id] || 0;
     const next = Math.max(0, current + delta);
-    if (next > current) {
-         confetti({particleCount: 60, spread: 50, origin: {y: 0.6}});
-    }
+    if (next > current) confetti({particleCount: 60, spread: 50, origin: {y: 0.6}});
     state[id] = next;
     save();
   }
 
-  // --- STREAK LOGIC ---
   function calculateStreaks(habitId) {
       const start = new Date(currentConfig.year, currentConfig.month, 1);
       const end = new Date(currentConfig.year, currentConfig.month, currentConfig.days);
-      
-      let maxStreak = 0;
-      let tempStreak = 0;
-      
+      let maxStreak = 0, tempStreak = 0;
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          const y = d.getFullYear();
-          const m = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
+          const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
           const dateStr = `${y}-${m}-${day}`;
-          
           const done = (state.calendar[dateStr] || []).includes(habitId);
-
-          if (done) {
-              tempStreak++;
-          } else {
-              tempStreak = 0;
-          }
+          if (done) tempStreak++; else tempStreak = 0;
           if (tempStreak > maxStreak) maxStreak = tempStreak;
       }
       return maxStreak;
@@ -509,12 +493,7 @@
                   state[t.id] = true;
                   changed = true;
                   setTimeout(() => {
-                      confetti({
-                          particleCount: 200,
-                          spread: 100,
-                          origin: { y: 0.6 },
-                          colors: ['#FFD700', '#FFA500']
-                      });
+                      confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 }, colors: ['#FFD700', '#FFA500'] });
                       alert(`🔥 STREAK ACHIEVED: ${t.text} (${streak} days!)`);
                   }, 500);
               }
@@ -523,40 +502,33 @@
       return changed;
   }
 
-  // --- CALENDAR LOGIC ---
   let selectedDate = null;
 
   function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '';
-
     ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
       const div = document.createElement('div');
       div.className = 'cal-day-name';
       div.innerText = d;
       grid.appendChild(div);
     });
-
-    const firstDay = new Date(currentConfig.year, currentConfig.month, 1).getDay(); // 0-6
-    for(let i=0; i<firstDay; i++) {
-        grid.appendChild(document.createElement('div'));
-    }
-
+    const firstDay = new Date(currentConfig.year, currentConfig.month, 1).getDay();
+    for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
     for (let i = 1; i <= currentConfig.days; i++) {
-      const y = currentConfig.year;
-      const m = String(currentConfig.month + 1).padStart(2, '0');
-      const d = String(i).padStart(2, '0');
+      const y = currentConfig.year, m = String(currentConfig.month + 1).padStart(2, '0'), d = String(i).padStart(2, '0');
       const dayStr = `${y}-${m}-${d}`;
-
       const div = document.createElement('div');
       div.className = 'cal-day';
-
       const habitsDone = state.calendar[dayStr] || [];
       const deadlineText = state.deadlines ? state.deadlines[dayStr] : null;
+      const studyItem = STUDY_PLAN[dayStr];
+      const studyDone = state.study && state.study[dayStr];
 
       if (habitsDone.length >= Math.ceil(currentHabits.length * 0.7)) div.classList.add('perfect');
       if (selectedDate === dayStr) div.classList.add('active');
       if (deadlineText) div.classList.add('has-deadline');
+      if (studyItem) div.classList.add('has-study');
 
       const numSpan = document.createElement('span');
       numSpan.innerText = i;
@@ -571,6 +543,13 @@
           habitContainer.appendChild(iconSpan);
       });
       div.appendChild(habitContainer);
+
+      if (studyItem) {
+          const sTag = document.createElement('div');
+          sTag.className = 'day-study-tag';
+          sTag.innerText = studyDone ? '✅' : '📖';
+          div.appendChild(sTag);
+      }
 
       if (deadlineText) {
           const dSpan = document.createElement('div');
@@ -595,6 +574,7 @@
     const grid = document.getElementById('habitGrid');
     const title = document.getElementById('habitDateTitle');
     const deadlineInput = document.getElementById('dayDeadlineInput');
+    const studyContainer = document.getElementById('studyPlanContainer');
 
     if (!selectedDate) {
       panel.style.display = 'none';
@@ -605,40 +585,53 @@
     title.innerText = `Protocols for ${selectedDate}`;
     grid.innerHTML = '';
     
-    // Load current deadline text
+    // Study Plan Section
+    studyContainer.innerHTML = '';
+    const studyItem = STUDY_PLAN[selectedDate];
+    if (studyItem) {
+        const isDone = state.study && state.study[selectedDate];
+        const card = document.createElement('div');
+        card.className = `study-check-card ${isDone ? 'done' : ''}`;
+        card.innerHTML = `
+            <div>
+                <h4>Institutional Study Task</h4>
+                <p>${studyItem}</p>
+            </div>
+            <div style="font-size:1.5rem">${isDone ? '✅' : '⬜'}</div>
+        `;
+        card.onclick = () => toggleStudy(selectedDate);
+        studyContainer.appendChild(card);
+    }
+
     deadlineInput.value = (state.deadlines && state.deadlines[selectedDate]) ? state.deadlines[selectedDate] : '';
-
     const doneToday = state.calendar[selectedDate] || [];
-
     currentHabits.forEach(h => {
       const isDone = doneToday.includes(h.id);
       const btn = document.createElement('div');
       btn.className = `habit-btn ${isDone ? 'done' : ''}`;
       btn.innerHTML = `<div class="habit-icon">${h.icon}</div><div>${h.label}</div>`;
-
       btn.onclick = () => {
         const current = state.calendar[selectedDate] || [];
-        if (current.includes(h.id)) {
-          state.calendar[selectedDate] = current.filter(x => x !== h.id);
-        } else {
-          state.calendar[selectedDate] = [...current, h.id];
-          confetti({particleCount: 40, spread: 40, origin: {y: 0.7}});
-        }
+        if (current.includes(h.id)) state.calendar[selectedDate] = current.filter(x => x !== h.id);
+        else { state.calendar[selectedDate] = [...current, h.id]; confetti({particleCount: 40, spread: 40, origin: {y: 0.7}}); }
         save();
       };
-
       grid.appendChild(btn);
     });
+  }
+
+  window.toggleStudy = function(date) {
+      if (!state.study) state.study = {};
+      state.study[date] = !state.study[date];
+      if (state.study[date]) confetti({particleCount: 100, spread: 70, origin: {y: 0.6}, colors: ['#6366f1', '#ffffff']});
+      save();
   }
 
   window.updateDayDeadline = function(val) {
       if (!selectedDate) return;
       if (!state.deadlines) state.deadlines = {};
-      if (val.trim()) {
-          state.deadlines[selectedDate] = val.trim();
-      } else {
-          delete state.deadlines[selectedDate];
-      }
+      if (val.trim()) state.deadlines[selectedDate] = val.trim();
+      else delete state.deadlines[selectedDate];
       save();
   }
 
@@ -651,11 +644,10 @@
     renderHabitPanel();
   }
   
-  // Backup Functions
   window.exportData = function() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
       const downloadAnchorNode = document.createElement('a');
-      downloadAnchorNode.setAttribute("href",     dataStr);
+      downloadAnchorNode.setAttribute("href", dataStr);
       downloadAnchorNode.setAttribute("download", `oksana_life_backup_${currentMonthId}.json`);
       document.body.appendChild(downloadAnchorNode);
       downloadAnchorNode.click();
@@ -679,9 +671,7 @@
                     save();
                     alert("Import successful!");
                 }
-            } catch(err) {
-                alert("Invalid JSON file");
-            }
+            } catch(err) { alert("Invalid JSON file"); }
          }
       }
       input.click();
@@ -689,78 +679,50 @@
 
     function render() {
       let total = 0, pmp=0, money=0, port=0;
-
-      // Add XP from habits (Compliance Bonus)
-      // We calculate XP from all days in the current month
       if (state.calendar) {
           Object.values(state.calendar).forEach(dayHabits => {
-              // 100p bonus per completed habit
               total += dayHabits.length * 100;
-              pmp += dayHabits.length * 50; // Arbitrary split for visually filling bars
+              pmp += dayHabits.length * 50;
               money += dayHabits.length * 25;
               port += dayHabits.length * 25;
           });
       }
-
-      const containers = {
-          pmp: document.getElementById('pmpTasks'),
-          money: document.getElementById('moneyTasks'),
-          port: document.getElementById('portTasks'),
-          side: document.getElementById('sideTasks')
-      };
-
+      if (state.study) {
+          Object.values(state.study).forEach(isDone => {
+              if (isDone) {
+                  total += 500; // 500 XP per study day
+                  pmp += 500;
+              }
+          });
+      }
+      const containers = { pmp: document.getElementById('pmpTasks'), money: document.getElementById('moneyTasks'), port: document.getElementById('portTasks'), side: document.getElementById('sideTasks') };
       Object.values(containers).forEach(el => el.innerHTML = '');
-
       allTasks.forEach(t => {
         const isRepeatable = t.type === "repeatable";
         const earned = (isRepeatable ? (state[t.id]||0) * t.p : (state[t.id]?t.p:0));
-
         total += earned;
-        if (t.cat==="pmp") pmp += earned;
-        if (t.cat==="money") money += earned;
-        if (t.cat==="port") port += earned;
-
+        if (t.cat==="pmp") pmp += earned; if (t.cat==="money") money += earned; if (t.cat==="port") port += earned;
         const div = document.createElement('div');
         div.className = `task ${state[t.id] ? 'done' : ''} ${isRepeatable ? 'repeatable' : ''}`;
-
         const leftHtml = `<span>${t.text} <b>${t.p > 0 ? '+' : ''}${t.p}p</b></span>`;
-
         let rightHtml = '';
-
         if (isRepeatable) {
             const count = state[t.id] || 0;
-            rightHtml += `
-            <div class="counter-controls" onclick="event.stopPropagation()">
-               <button class="btn-count" onclick="window.changeCount('${t.id}', -1)">−</button>
-               <span class="count-display">${count}</span>
-               <button class="btn-count" onclick="window.changeCount('${t.id}', 1)">+</button>
-            </div>
-            `;
+            rightHtml += `<div class="counter-controls" onclick="event.stopPropagation()"><button class="btn-count" onclick="window.changeCount('${t.id}', -1)">−</button><span class="count-display">${count}</span><button class="btn-count" onclick="window.changeCount('${t.id}', 1)">+</button></div>`;
         } else {
             const isChecked = state[t.id] ? 'checked' : '';
-            rightHtml += `
-            <input type="checkbox" ${isChecked} onchange="window.toggle('${t.id}')">
-            `;
+            rightHtml += `<input type="checkbox" ${isChecked} onchange="window.toggle('${t.id}')">`;
         }
-
         if (t.id.toString().startsWith('custom_')) {
-            rightHtml += `
-            <div class="task-controls">
-                <button class="control-btn edit" title="Edit">✎</button>
-                <button class="control-btn delete" title="Delete">✕</button>
-            </div>
-            `;
+            rightHtml += `<div class="task-controls"><button class="control-btn edit" title="Edit">✎</button><button class="control-btn delete" title="Delete">✕</button></div>`;
         }
-
         div.innerHTML = `${leftHtml}<div style="display:flex; align-items:center; gap:10px;">${rightHtml}</div>`;
-
         if (t.id.toString().startsWith('custom_')) {
             const editBtn = div.querySelector('.control-btn.edit');
             const deleteBtn = div.querySelector('.control-btn.delete');
             if (editBtn) editBtn.onclick = (e) => { e.stopPropagation(); window.openEditTask(t.id); };
             if (deleteBtn) deleteBtn.onclick = (e) => { e.stopPropagation(); window.deleteTask(t.id); };
         }
-
         if (!isRepeatable) {
           div.onclick = (e) => {
             if (e.target.type !== 'checkbox' && !e.target.closest('.task-controls') && !e.target.closest('.counter-controls')) {
@@ -769,106 +731,28 @@
             }
           };
         }
-
         const targetContainer = containers[t.cat] || containers['side'];
         targetContainer.appendChild(div);
       });
-
       const targetXP = currentConfig.target || 30000;
       const percent = Math.min(100, Math.round(total / targetXP * 100));
       const fill = document.getElementById('xpFill');
       fill.style.width = percent + "%";
       fill.textContent = `${total.toLocaleString()} / ${targetXP.toLocaleString()} xp · ${percent}%`;
-
       document.getElementById('pmpScore').textContent = pmp.toLocaleString() + "p";
       document.getElementById('moneyScore').textContent = money.toLocaleString() + "p";
       document.getElementById('portScore').textContent = port.toLocaleString() + "p";
     }
 
-    // Modal Logic
-    window.openAddTask = function(cat) {
-        editingId = null;
-        document.getElementById('modalTitle').innerText = 'Add New Task';
-        document.getElementById('newTaskCat').value = cat;
-        document.getElementById('newTaskText').value = '';
-        document.getElementById('newTaskPoints').value = '';
-        document.getElementById('addModal').style.display = 'flex';
-        document.getElementById('newTaskText').focus();
-    }
-
-    window.openEditTask = function(id) {
-        const task = state.customTasks.find(t => t.id === id);
-        if (!task) return;
-
-        editingId = id;
-        document.getElementById('modalTitle').innerText = 'Edit Task';
-        document.getElementById('newTaskCat').value = task.cat;
-        document.getElementById('newTaskText').value = task.text;
-        document.getElementById('newTaskPoints').value = task.p;
-        document.getElementById('newTaskType').value = task.type;
-
-        document.getElementById('addModal').style.display = 'flex';
-    }
-
-    window.closeModal = function() {
-        document.getElementById('addModal').style.display = 'none';
-    }
-
-    window.saveTask = function() {
-        const text = document.getElementById('newTaskText').value;
-        const points = parseInt(document.getElementById('newTaskPoints').value) || 0;
-        const type = document.getElementById('newTaskType').value;
-        const cat = document.getElementById('newTaskCat').value;
-
-        if (!text) {
-            alert("Task description is required.");
-            return;
-        }
-
-        if (editingId) {
-            const idx = state.customTasks.findIndex(t => t.id === editingId);
-            if (idx !== -1) {
-                state.customTasks[idx] = { ...state.customTasks[idx], text, p: points, type, cat };
-            }
-        } else {
-            const newTask = {
-                id: 'custom_' + Date.now(),
-                text: text,
-                p: points,
-                cat: cat,
-                type: type
-            };
-            state.customTasks.push(newTask);
-        }
-
-        save();
-        mergeTasks();
-        render();
-        closeModal();
-    }
-
-    window.deleteTask = function(id) {
-        if(!confirm("Delete this task?")) return;
-        state.customTasks = state.customTasks.filter(t => t.id !== id);
-        delete state[id];
-        save();
-        mergeTasks();
-        render();
-    }
-    
-    // Add Footer Controls
+    window.openAddTask = function(cat) { editingId = null; document.getElementById('modalTitle').innerText = 'Add New Task'; document.getElementById('newTaskCat').value = cat; document.getElementById('newTaskText').value = ''; document.getElementById('newTaskPoints').value = ''; document.getElementById('addModal').style.display = 'flex'; document.getElementById('newTaskText').focus(); }
+    window.openEditTask = function(id) { const task = state.customTasks.find(t => t.id === id); if (!task) return; editingId = id; document.getElementById('modalTitle').innerText = 'Edit Task'; document.getElementById('newTaskCat').value = task.cat; document.getElementById('newTaskText').value = task.text; document.getElementById('newTaskPoints').value = task.p; document.getElementById('newTaskType').value = task.type; document.getElementById('addModal').style.display = 'flex'; }
+    window.closeModal = function() { document.getElementById('addModal').style.display = 'none'; }
+    window.saveTask = function() { const text = document.getElementById('newTaskText').value; const points = parseInt(document.getElementById('newTaskPoints').value) || 0; const type = document.getElementById('newTaskType').value; const cat = document.getElementById('newTaskCat').value; if (!text) { alert("Task description is required."); return; } if (editingId) { const idx = state.customTasks.findIndex(t => t.id === editingId); if (idx !== -1) { state.customTasks[idx] = { ...state.customTasks[idx], text, p: points, type, cat }; } } else { const newTask = { id: 'custom_' + Date.now(), text: text, p: points, cat: cat, type: type }; state.customTasks.push(newTask); } save(); mergeTasks(); render(); closeModal(); }
+    window.deleteTask = function(id) { if(!confirm("Delete this task?")) return; state.customTasks = state.customTasks.filter(t => t.id !== id); delete state[id]; save(); mergeTasks(); render(); }
     const footer = document.createElement('div');
-    footer.style.textAlign = 'center';
-    footer.style.marginTop = '50px';
-    footer.style.padding = '20px';
-    footer.style.opacity = '0.7';
-    footer.innerHTML = `
-      <button onclick="exportData()" class="btn-secondary">💾 Backup Data</button>
-      <button onclick="importData()" class="btn-secondary">📂 Restore Data</button>
-    `;
+    footer.style.cssText = 'text-align:center; margin-top:50px; padding:20px; opacity:0.7;';
+    footer.innerHTML = `<button onclick="exportData()" class="btn-secondary">💾 Backup Data</button> <button onclick="importData()" class="btn-secondary">📂 Restore Data</button>`;
     document.querySelector('.container').appendChild(footer);
-
     init();
-
   </script></body>
 </html>
