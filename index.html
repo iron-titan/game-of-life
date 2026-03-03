@@ -201,8 +201,8 @@
   ];
   
   // Default to latest month, or load from URL/Storage
-  let currentMonthId = localStorage.getItem("oksanaLifeCurrentMonth") || 'jan2026';
-  let currentConfig = MONTHS.find(m => m.id === currentMonthId) || MONTHS[1];
+  let currentMonthId = localStorage.getItem("oksanaLifeCurrentMonth") || 'mar2026';
+  let currentConfig = MONTHS.find(m => m.id === currentMonthId) || MONTHS[3];
 
   let baseTasks = []; // From JSON
   let allTasks = [];  // Merged

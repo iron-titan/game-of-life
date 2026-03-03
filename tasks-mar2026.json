@@ -1,14 +1,21 @@
 [
   { "id": "mar26_habit_social_1", "text": "No social media (Morning)", "p": 100, "cat": "side", "type": "repeatable" },
+  { "id": "mar26_habit_social_streak10", "text": "No socials 10-day streak", "p": 300, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 10 } },
+  { "id": "mar26_habit_social_streak20", "text": "No socials 20-day streak", "p": 500, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 20 } },
   { "id": "mar26_habit_social_streak30", "text": "No socials 30-day streak", "p": 800, "cat": "side", "type": "once", "streakCondition": { "habitId": "social", "count": 30 } },
 
   { "id": "mar26_habit_journal_1", "text": "Achievement Journal", "p": 200, "cat": "side", "type": "repeatable" },
+  { "id": "mar26_habit_journal_streak10", "text": "Journal 10-day streak", "p": 300, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 10 } },
+  { "id": "mar26_habit_journal_streak20", "text": "Journal 20-day streak", "p": 500, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 20 } },
   { "id": "mar26_habit_journal_streak30", "text": "Journal 30-day streak", "p": 800, "cat": "side", "type": "once", "streakCondition": { "habitId": "journal", "count": 30 } },
 
   { "id": "mar26_habit_study_1", "text": "Study/Video 2h", "p": 300, "cat": "pmp", "type": "repeatable" },
   { "id": "mar26_habit_meals_1", "text": "Meal with protein", "p": 100, "cat": "side", "type": "repeatable" },
   { "id": "mar26_habit_supp_1", "text": "Supplements", "p": 100, "cat": "side", "type": "repeatable" },
+  
+  { "id": "mar26_drive_lesson", "text": "Driving Lesson (each)", "p": 1000, "cat": "side", "type": "repeatable" },
   { "id": "mar26_gym_week", "text": "Gym 3x/week complete", "p": 1000, "cat": "side", "type": "repeatable" },
+  { "id": "mar26_gym_streak4", "text": "Gym 4-week streak", "p": 5000, "cat": "side", "type": "once" },
 
   { "id": "mar26_money_30", "text": "Runway 30% ($1800)", "p": 2500, "cat": "money", "type": "once" },
   { "id": "mar26_money_60", "text": "Runway 60% ($3600)", "p": 4000, "cat": "money", "type": "once" },
@@ -17,11 +24,21 @@
   
   { "id": "mar26_job_offer", "text": "OFFER SIGNED (Remote/IL)", "p": 25000, "cat": "money", "type": "once" },
   { "id": "mar26_job_app_cont", "text": "Job App / Interview (Continue)", "p": 1000, "cat": "money", "type": "repeatable" },
+  { "id": "mar26_net_low", "text": "Networking: 3-4 interactions", "p": 400, "cat": "side", "type": "repeatable" },
+  { "id": "mar26_net_mid", "text": "Networking: 4-6 interactions", "p": 1600, "cat": "side", "type": "repeatable" },
+  { "id": "mar26_net_high", "text": "Networking: 7-10 interactions", "p": 2000, "cat": "side", "type": "repeatable" },
+  { "id": "mar26_net_person", "text": "Networking: In-person", "p": 1000, "cat": "side", "type": "repeatable" },
   
   { "id": "mar26_eggs_ship", "text": "Eggs: Shipping Prep (Docs/Courier)", "p": 10000, "cat": "port", "type": "once" },
   { "id": "mar26_code_python", "text": "Python / freeCodeCamp Project", "p": 8000, "cat": "port", "type": "once" },
   { "id": "mar26_cert_jira", "text": "Jira Professional Exam", "p": 6000, "cat": "pmp", "type": "once" },
   
+  { "id": "mar26_elastic_launch", "text": "ElasticPM: Institutional UI & API Launch", "p": 15000, "cat": "port", "type": "once" },
+  
+  { "id": "mar26_sec_study", "text": "Security+ Compliance Study (daily)", "p": 500, "cat": "pmp", "type": "repeatable" },
+  { "id": "mar26_sec_mock", "text": "Security+ Mock Exam (>80%)", "p": 3000, "cat": "pmp", "type": "repeatable" },
+  { "id": "mar26_sec_cert", "text": "SECURITY+ EXAM PASSED", "p": 20000, "cat": "pmp", "type": "once" },
+
   { "id": "mar26_side_passive", "text": "Side: Passive Follow-ups Harvest", "p": 5000, "cat": "side", "type": "once" },
 
   { "id": "mar26_deduct_knit", "text": "Deduction: Knitting >1h", "p": -500, "cat": "side", "type": "repeatable" },
