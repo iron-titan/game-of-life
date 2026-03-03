@@ -222,37 +222,37 @@
   let editingId = null;
 
   const STUDY_PLAN = {
-    "2026-03-01": "Day 1: IT Security Fundamentals & Threats",
-    "2026-03-02": "Day 2: Vulnerabilities & Attack Signs",
-    "2026-03-03": "Day 3: Cryptography (1st half)",
-    "2026-03-04": "Day 4: Cryptography (2nd half)",
-    "2026-03-05": "Day 5: Social Engineering Protocols",
-    "2026-03-06": "Day 6: Security Architecture & Asset Security",
-    "2026-03-07": "Day 7: Data Protection & Principles",
-    "2026-03-08": "Day 8: Common Security Techniques",
-    "2026-03-09": "Day 9: Vulnerability Mgmt & Monitoring",
-    "2026-03-10": "Day 10: IAM (Identity Access Mgmt)",
-    "2026-03-11": "Day 11: Incident Response & Governance",
-    "2026-03-12": "Day 12: Risk & Vendor Management",
-    "2026-03-13": "Day 13: Physical Security & Resilience",
-    "2026-03-14": "Day 14: Security+ Labs: Environment",
-    "2026-03-15": "Day 15: Security+ Labs: Tools",
-    "2026-03-16": "Day 16: Security+ Labs: Analysis",
-    "2026-03-17": "Day 17: Security+ Labs: Hardening",
-    "2026-03-18": "Day 18: Security+ Labs: Audit",
-    "2026-03-19": "Day 19: Full Mock Exam #1",
-    "2026-03-20": "Day 20: Domain Review & Mock #2",
-    "2026-03-21": "Day 21: Full Mock Exam #3",
-    "2026-03-22": "Day 22: Domain Review & Mock #4",
-    "2026-03-23": "Day 23: Full Mock Exam #5",
-    "2026-03-24": "Day 24: Domain Review & Mock #6",
-    "2026-03-25": "Day 25: Final Mock & Weak Points",
-    "2026-03-26": "Day 26: Last Minute Cram #1",
-    "2026-03-27": "Day 27: Last Minute Cram #2",
-    "2026-03-28": "Day 28: PERFORMANCE READINESS CHECK",
-    "2026-03-29": "Day 29: Final Calm Review",
-    "2026-03-30": "Day 30: PRE-EXAM LOGISTICS",
-    "2026-03-31": "FINAL EXAM DEADLINE"
+    "2026-03-01": "Day 1: Register for Exam (MUST DO) + Sec 2, 3, 4 (Fundamentals & Threats)",
+    "2026-03-02": "Day 2: Sec 5 & 6 (Vulnerabilities & Attack Signs)",
+    "2026-03-03": "Day 3: Sec 7 (Cryptography - Part 1)",
+    "2026-03-04": "Day 4: Sec 7 (Cryptography - Part 2)",
+    "2026-03-05": "Day 5: Sec 8 (Social Engineering)",
+    "2026-03-06": "Day 6: Sec 9 & 10 (IT Assets & Security Architecture)",
+    "2026-03-07": "Day 7: Sec 11 & 12 (Principles & Data Protection)",
+    "2026-03-08": "Day 8: Sec 13 & 14 (Security Techniques & Asset Mgmt)",
+    "2026-03-09": "Day 9: Sec 15 & 16 (Vulnerability Mgmt & Monitoring)",
+    "2026-03-10": "Day 10: Sec 17 & 18 (Enhance Security & IAM)",
+    "2026-03-11": "Day 11: Sec 19 & 20 (Incident Response & Governance)",
+    "2026-03-12": "Day 12: Sec 21 & 22 (Risk & Vendor Management)",
+    "2026-03-13": "Day 13: Sec 23, 24, 25 (Physical, Change & Resilience)",
+    "2026-03-14": "Day 14: Sec 26 (Labs - Session 1)",
+    "2026-03-15": "Day 15: Sec 26 (Labs - Session 2)",
+    "2026-03-16": "Day 16: Sec 26 (Labs - Session 3)",
+    "2026-03-17": "Day 17: Sec 26 (Labs - Session 4)",
+    "2026-03-18": "Day 18: Sec 26 (Labs - Session 5)",
+    "2026-03-19": "Day 19: Course Mock Exam",
+    "2026-03-20": "Day 20: Udemy Mock Exam 1",
+    "2026-03-21": "Day 21: Udemy Mock Exam 2",
+    "2026-03-22": "Day 22: Udemy Mock Exam 3",
+    "2026-03-23": "Day 23: Udemy Mock Exam 4",
+    "2026-03-24": "Day 24: Udemy Mock Exam 5",
+    "2026-03-25": "Day 25: Udemy Mock Exam 6",
+    "2026-03-26": "Day 26: Review Last Minute Cram Guide",
+    "2026-03-27": "Day 27: Review Last Minute Cram Guide",
+    "2026-03-28": "Day 28: TAKE ACTUAL CERTIFICATION",
+    "2026-03-29": "Post-Exam Harvest / Recovery",
+    "2026-03-30": "Post-Exam Harvest / Recovery",
+    "2026-03-31": "March Completion Milestone"
   };
 
   const DEFAULT_HABITS = [
@@ -320,7 +320,7 @@
 
       if (!state.calendar) state.calendar = {};
       if (!state.deadlines) state.deadlines = {};
-      if (!state.study) state.study = {}; // Study plan checkmarks
+      if (!state.study) state.study = {};
       if (!state.customTasks) state.customTasks = [];
       
       if (!state.habits || state.habits.length === 0) {
@@ -426,7 +426,9 @@
       save();
       if (scope === 'future') {
           applyToFutureMonths(s => {
-              if (s.habits) s.habits = s.habits.filter(h => h.id !== id);
+              if (s.habits) {
+                  s.habits = s.habits.filter(h => h.id !== id);
+              }
               return s;
           });
       }
@@ -594,7 +596,7 @@
         card.className = `study-check-card ${isDone ? 'done' : ''}`;
         card.innerHTML = `
             <div>
-                <h4>Institutional Study Task</h4>
+                <h4>Course Study Task</h4>
                 <p>${studyItem}</p>
             </div>
             <div style="font-size:1.5rem">${isDone ? '✅' : '⬜'}</div>
@@ -690,7 +692,7 @@
       if (state.study) {
           Object.values(state.study).forEach(isDone => {
               if (isDone) {
-                  total += 500; // 500 XP per study day
+                  total += 500;
                   pmp += 500;
               }
           });
